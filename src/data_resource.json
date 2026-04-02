@@ -1,0 +1,91 @@
+[{
+    "id": "twitter_ai_topic",
+    "active": true,
+    "entity_type": "account",
+    "trigger_mode" : "pull",
+    "targets": [
+    "elonmusk",
+    "sama",
+    "naval",
+    "balajis",
+    "paulg",
+    "raydalio",
+    "elonmusk",
+    "federalreserve",
+    "ecb",
+    "imfnews"],
+    "source_type": "idea",
+  
+    "signal_type": ["narrative", "tech_trend"],
+  
+    "platform": {
+      "name": "twitter",
+      "has_api": true
+    },
+  
+    "access": {
+      "mode": "api",
+      "url": "twitter search endpoint",
+      "selectors": null
+    },
+  
+    "frequency": "high",
+    "priority": 1,
+    "metadata": {
+        "authority_score": 0.95,
+        "region": "global"
+      }
+  },
+
+  {
+    "id": "fed_policy",
+    "active": true,
+    "entity_type": "webpage",
+    "source_type": "knowledge",
+    "trigger_mode" : "pull",
+    "signal_type": ["policy"],
+  
+    "platform": {
+      "name": "federal_reserve",
+      "has_api": false
+    },
+  
+    "access": {
+      "mode": "browser",
+      "url": "https://www.federalreserve.gov",
+      "selectors": null
+    },
+  
+    "frequency": "low",
+    "priority": 1,
+    "metadata": {
+        "authority_score": 0.95,
+        "region": "global"
+      }
+  },
+  {
+    "id": "techcrunch_website",
+    "active": true,
+    "entity_type": "webpage",
+    "trigger_mode" : "pull",
+    "identifier": {
+      "value": "https://techcrunch.com",
+      "platform": "website"
+    },
+    "source_type": "tech_trend",
+    "signal_type": ["narrative", "technology"],
+    "access": {
+      "mode": "scraper",
+      "endpoint": null,
+      "selector": ".article-title"
+    },
+    "frequency": "medium",
+    "priority": 2,
+    "metadata": {
+      "authority_score": 0.85,
+      "region": "global"
+    }
+  }
+
+]
+
