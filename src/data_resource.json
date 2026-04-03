@@ -1,6 +1,6 @@
 [{
     "id": "twitter_ai_topic",
-    "active": true,
+    "active": false,
     "entity_type": "account",
     "trigger_mode" : "pull",
     "targets": [
@@ -26,7 +26,11 @@
     "access": {
       "mode": "api",
       "url": "twitter search endpoint",
-      "selectors": null
+      "selectors": null,
+      "parse": {
+        "type": "x_api_v2_search",
+        "note": "需要 Bearer Token；当前仅占位，未接入真实 X API"
+      }
     },
   
     "frequency": "high",
@@ -39,7 +43,7 @@
 
   {
     "id": "fed_policy",
-    "active": true,
+    "active": false,
     "entity_type": "webpage",
     "source_type": "knowledge",
     "trigger_mode" : "pull",
@@ -53,7 +57,11 @@
     "access": {
       "mode": "browser",
       "url": "https://www.federalreserve.gov",
-      "selectors": null
+      "selectors": null,
+      "parse": {
+        "type": "html",
+        "note": "静态官网页；后续可加 css selector / 链接抽取"
+      }
     },
   
     "frequency": "low",
@@ -65,7 +73,7 @@
   },
   {
     "id": "techcrunch_website",
-    "active": true,
+    "active": false,
     "entity_type": "webpage",
     "trigger_mode" : "pull",
     "identifier": {
@@ -76,13 +84,109 @@
     "signal_type": ["narrative", "technology"],
     "access": {
       "mode": "scraper",
+      "url": "https://techcrunch.com",
       "endpoint": null,
-      "selector": ".article-title"
+      "selector": ".article-title",
+      "selectors": {
+        "title": ".article-title"
+      },
+      "parse": {
+        "type": "css",
+        "selector": ".article-title"
+      }
     },
     "frequency": "medium",
     "priority": 2,
     "metadata": {
       "authority_score": 0.85,
+      "region": "global"
+    }
+  }
+  ,
+  {
+    "id": "google_news_ai_policy",
+    "active": false,
+    "entity_type": "webpage",
+    "trigger_mode": "pull",
+    "source_type": "knowledge",
+    "signal_type": ["policy", "technology"],
+    "platform": {
+      "name": "google",
+      "has_api": false
+    },
+    "access": {
+      "mode": "scraper",
+      "url": "https://news.google.com/rss/search?q=AI%20regulation%20OR%20OpenAI&hl=en-US&gl=US&ceid=US:en",
+      "selectors": null,
+      "parse": {
+        "type": "rss",
+        "items": "item",
+        "title": "title"
+      }
+    },
+    "frequency": "low",
+    "priority": 2,
+    "metadata": {
+      "authority_score": 0.9,
+      "region": "global"
+    }
+  },
+  {
+    "id": "x_bigshots_latest",
+    "active": true,
+    "entity_type": "account",
+    "trigger_mode": "pull",
+    "targets": ["elonmusk", "sama", "samaltman", "naval"],
+    "source_type": "idea",
+    "signal_type": ["narrative", "social_trend"],
+    "platform": {
+      "name": "x",
+      "has_api": false
+    },
+    "access": {
+      "mode": "scraper",
+      "url": "https://xcancel.com",
+      "selectors": {
+        "tweet_text": ".tweet-content",
+        "tweet_link": "a.tweet-link",
+        "tweet_time": ".tweet-date a[title]"
+      },
+      "parse": {
+        "type": "nitter_profile",
+        "note": "抓取每个账号主页最新推文（文本+时间+链接），不依赖 X API"
+      }
+    },
+    "frequency": "medium",
+    "priority": 2,
+    "metadata": {
+      "authority_score": 0.9,
+      "region": "global"
+    }
+  },
+  {
+    "id": "polymarket_ai_policy_forecast",
+    "active": false,
+    "entity_type": "webpage",
+    "trigger_mode": "pull",
+    "source_type": "expectation",
+    "signal_type": ["capital_flow", "macro"],
+    "platform": {
+      "name": "polymarket",
+      "has_api": false
+    },
+    "access": {
+      "mode": "browser",
+      "url": "https://polymarket.com/zh/economy",
+      "selectors": null,
+      "parse": {
+        "type": "next_data",
+        "note": "优先解析 __NEXT_DATA__ JSON（比 DOM selector 稳定）"
+      }
+    },
+    "frequency": "low",
+    "priority": 2,
+    "metadata": {
+      "authority_score": 0.75,
       "region": "global"
     }
   }

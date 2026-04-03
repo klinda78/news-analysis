@@ -45,5 +45,9 @@ trend direction
 
 重点字段：
 probability shift
+s&p500
+rate
+Inflation
+Debt
 capital flow
 positioning

@@ -30,6 +30,13 @@ Knowledge Market \google\bilibili  -- deep insign
 Behavior Ma rket  \taobao\pingduoduo -- real demand  
 Expectation Market  *Polymarket** -- capital flow in
 
+## dataresource types:
+entity_type:
+account   → KOL / 人 / 机构账号
+webpage   → 页面
+api       → 数据接口
+dataset   → 数据集
+
 ## event types
 
 Policy Event

@@ -1,7 +1,9 @@
 // data_ingestion.js
 
-const fetchData = require('./fetch_router');
+const fetchData = require('./fetch_route');
 const parser = require('./parser');
+const { preFilter } = require('./Pre-Compression/pre_filter');
+const { marketMapping } = require('./Pre-Compression/market_mapping');
 
 module.exports = async function dataIngestion(source) {
   
@@ -11,7 +13,16 @@ module.exports = async function dataIngestion(source) {
   if (!rawData) return null;
 
   // 2️⃣ parse → 标准结构
-  const formatted = parser(rawData, source);
+  const event = parser(rawData, source);
+  if (!event) return null;
 
-  return formatted;
+  // 3️⃣ pre-compression filtering
+  const threshold = Number(process.env.EVENT_IMPACT_THRESHOLD ?? 20);
+  const passed = preFilter(event, threshold);
+  if (!passed) return null;
+
+  // 4️⃣ market mapping
+  const mapped = marketMapping(passed);
+
+  return mapped;
 };
