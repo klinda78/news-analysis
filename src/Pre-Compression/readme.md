@@ -123,6 +123,9 @@ cluster_obj:
   "keywords": ["iran","oil","sanction"]
 }
 ```
-
+***note***
+cluster_obj 主要用来判断“这是一个潜在事件”
+event_obj 结构化后，用于 expert agent 做分析、打分、追踪
+event_obj 可附加派生指标（如 velocity、priority），cluster_obj 保留原始聚类信息
 
 
