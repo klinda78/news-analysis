@@ -52,9 +52,9 @@ Macro Trigger
 ```mermaid
 flowchart TD 
     A[Event Source]
-    A --> B[News Monitor Agent<br/>筛选事件 + 初步资产映射]
-    B --> C[Content Operator Agent<br/>检测传播加速 + 跨圈扩散]
-    C --> D[Investment Research Agent<br/>验证 + 构建交易假设]
+    A --> B[News Monitor Agent<br/>筛选事件 +聚类=>enrich_event_obj]
+    B --> C[Content Operator Agent<br/>聚焦事件演化<br/>&#40传播加速 + 跨圈扩散&#41]
+    C --> D[Investment Research Agent<br/> 初步资产映射+ 验证 + 构建交易假设]
     D --> E[Main Agent<br/>选择是否执行 / 调整策略]
     E --> F[Execution / Strategy System]
 ```
