@@ -1,12 +1,12 @@
 ## 数据预处理简要说明
-
+```flowchart
 rawdata.jsonl（原始数据）
 轻量筛选（太短 / 无实体 / 重复）
 嵌入 + 聚类 → cluster_obj
 cluster_obj → event_obj（最小结构化对象）
 对 event_obj 调用 LLM summary → 输出高价值候选事件
 expert agent 分析/洞察/打分/生成 impact_score
-
+```
 ## 技术处理的侧重
 
 第一：要尽量保留原始数据的完整
@@ -20,19 +20,22 @@ expert agent 分析/洞察/打分/生成 impact_score
 ## 步骤细节
 ---------------------------
 ***python 去除噪音***
-
+```code
 if:
     太短（<20字）
     or 无实体（无公司/国家/行业）
     or 重复内容
+```
 ***cluster聚类(看到主题)***
+```code
 1条 = 噪音概率极高  
 3条 = 开始像事件  
 5条+ = 值得关注
 可以用轻量级的embedding聚类，但不要一开始就上LLM
+```
 note:cluster → event_obj = 数据整理，不是理解(expert agent 才负责洞察)
 
-***用llm summary event***
+***用llm summary event***  
 filter后把有价值的才给 expert 看）
 
 
