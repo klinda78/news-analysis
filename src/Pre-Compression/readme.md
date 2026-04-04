@@ -1,4 +1,7 @@
 ## 数据预处理简要说明
+目前我们的Fetcher类已经解决了原始数据的抓取问题。接着要进行进一步的预处理，  
+才能得到符合我们要求的enrich_event_obj:  
+
 ```flowchart
 rawdata.jsonl（原始数据）
 轻量筛选（太短 / 无实体 / 重复）
@@ -9,8 +12,9 @@ expert agent 分析/洞察/打分/生成 impact_score
 ```
 ## 技术处理的侧重
 
-第一：要尽量保留原始数据的完整
-得到append oneline into jsonl的原始数据，
+第一：一开始抓取数据的时候要尽量保留原始数据的完整
+以append oneline into jsonl的的形式获取和增加原始数据，  
+保存到memory\raw_datexxxx.jsonl
 
 第二：必须“稳定” ，需要对原始数据进行初步筛选
 技术方案是，压缩信息（embedding + cluster）
@@ -36,8 +40,8 @@ if:
 note:cluster → event_obj = 数据整理，不是理解(expert agent 才负责洞察)
 
 ***用llm summary event***  
-filter后把有价值的才给 expert 看）
-
+filter后把有价值的才给 expert 看）  
+输出candidate_event 数据到memory\event_datexxx.jsonl
 
 ## 处理流程图：
 
