@@ -7,10 +7,6 @@ graph TD
 
 ```
 
-
-
-侧重点：Agent 的身份、定位、目标与行为风格
-
 文件结构
 ```
 invest-agent/
@@ -36,6 +32,7 @@ invest-agent/
 各个文件说明  
 1. 身份与核心信息类
 文件：AGENT.md、identity.md、soul.md
+侧重点：Agent 的身份、定位、目标与行为风格
 ```
 AGENT.md
 核心目标：定义整个 agent 的整体身份与功能定位
