@@ -1,4 +1,4 @@
-## How an event has trading value:
+## How an event has tradable value:
 
 ```mermaid
 flowchart LR
