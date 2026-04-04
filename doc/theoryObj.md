@@ -48,20 +48,16 @@ Technology Breakthrough
 Macro Trigger
 
 ## Event-driven multi-expert system
+```mermaid
+flowchart TD
+A [Event Source]
+A --> B[News Monitor Agent \ (筛选事件 + 初步资产映射)]
 
-Event Source
-   │
-   ▼
-News Monitor Agent
-   │  (筛选事件 + 初步资产映射)
-   ▼
-Content Operator Agent
-   │  (检测传播加速 + 跨圈扩散)
-   ▼
-Investment Research Agent
-   │  (验证 + 构建交易假设)
-   ▼
-Main Agent (你)
-   │  (选择是否执行 / 调整策略)
-   ▼
-Execution / Strategy System
+B --> C[Content Operator Agent\ (检测传播加速 + 跨圈扩散)]
+
+C --> D[Investment Research Agent\(验证 + 构建交易假设)]
+
+D --> E[Main Agent (你)\ (选择是否执行 / 调整策略)]
+
+E --> [Execution / Strategy System]
+```
