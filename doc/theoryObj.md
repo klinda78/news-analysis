@@ -30,7 +30,7 @@ Knowledge Market \google\bilibili  -- deep insign
 Behavior Ma rket  \taobao\pingduoduo -- real demand  
 Expectation Market  *Polymarket** -- capital flow in
 ```
-## Dataresource types:
+## Resource types:
 ```flowchart
 entity_type:
 account   → KOL / 人 / 机构账号
