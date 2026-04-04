@@ -1,4 +1,4 @@
-## how the signal has value:
+## How an event has trading value:
 
 ```mermaid
 flowchart LR
