@@ -15,7 +15,7 @@ flowchart LR
 
 
 
-## an life status of an event:
+## An life status of an event:
 ```flowchart
 Phase 1 研究 / 弱信号 
 Phase 2 专家讨论 
@@ -23,14 +23,14 @@ Phase 3 事件催化
 Phase 4 扩散 
 Phase 5 共识（已经晚了）
 ```
-## source types
+## Source types
 ```flowchart
 Idea content yard  \twitter -- narrative  
 Knowledge Market \google\bilibili  -- deep insign  
 Behavior Ma rket  \taobao\pingduoduo -- real demand  
 Expectation Market  *Polymarket** -- capital flow in
 ```
-## dataresource types:
+## Dataresource types:
 ```flowchart
 entity_type:
 account   → KOL / 人 / 机构账号
@@ -38,7 +38,7 @@ webpage   → 页面
 api       → 数据接口
 dataset   → 数据集
 ```
-## event types
+## Event types
 ```flowchart
 Policy Event
 Supply Shock
