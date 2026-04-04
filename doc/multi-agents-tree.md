@@ -28,8 +28,14 @@ invest-agent/
     └─ MEMORY.md            # 历史事件、决策记录、经验积累
 
 ```
-
-各个文件说明  
+🔹 引用与依赖关系（逻辑）
+```code
+thinking_model.md → 引用 soul.md 的价值观和风险偏好
+OPPORTUNITY_FRAMEWORK.md → 可以引用 knowledge_base.md 的理论知识
+thinking_model.md → 可调用 OPPORTUNITY_FRAMEWORK.md 输出作为决策输入
+所有记忆类文件 → 可以被算法类文件读取，用于优化决策
+```
+🔹 各个文件说明  
 1. 身份与核心信息类
 文件：AGENT.md、identity.md、soul.md
 侧重点：Agent 的身份、定位、目标与行为风格
@@ -58,3 +64,12 @@ soul.md
 长期行为倾向与使命感
 呈现形式：描述性文字 + 行为规则示例
 ```
+2 . 其他文件作用说明
+| 文件类型 | 文件 | 核心目标 | 核心内容 | 形式化呈现 |
+| --- | --- | --- | --- | --- |
+| skill | market_map.md | 能力认知 | 市场结构、指标、信号 | 层级/图谱 |
+| skill | knowledg | 知识储备 | _ | 表格/条目 |
+| 算法 | thinking_model.md | _ | 推理规则、流程、优先级 | 流程图/伪代码 |
+| 算法 | OPPORTUNI | 机会识别 | 触发条件、风险收益 | _ |
+| 记忆 | OPPORTUNITY_STATE.md | 当前机会状态 | 机会评分、阶段 | 表格/状态机 |
+| 记忆 | MEMORY.md | 历史记录 | 决策记录、经验 | 时间序列/日志条目 |
