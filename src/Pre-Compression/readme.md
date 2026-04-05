@@ -48,20 +48,17 @@ filter后把有价值的才给 expert 看）
 ```mermaid
 flowchart TD
 
-O[rawdata -jsonl]
-O --> A[ 文本级过滤 ]
-A --> B[embedding]
-B --> C[clustering]
-
-C --> D{clster_obj,cluster_size > 2?}
-
-D --> X[NO 丢弃]
-
-D --> E[YES 轻量LLM判断<br/>可选]
-
-E --> F[candidate events/event_obj]
-
-F --> G[TO expert] 
+    O[rawdata jsonl]
+    O --> A[文本级过滤]
+    A --> B[embedding]
+    B --> C[clustering]
+    C --> D{cluster size greater than 2}
+    
+    D -->|NO| X[丢弃]
+    D -->|YES| E[轻量LLM判断 可选]
+    
+    E --> F[candidate events]
+    F --> G[TO expert]
 ```
 
 
