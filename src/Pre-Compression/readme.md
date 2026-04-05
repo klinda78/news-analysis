@@ -12,16 +12,16 @@ expert agent 分析/洞察/打分/生成 impact_score
 ```
 ## 技术处理的侧重
 
-第一：一开始抓取数据的时候要尽量保留原始数据的完整
+第一：一开始抓取数据的时候我们尽量保留原始数据的完整
 以append oneline into jsonl的的形式获取和增加原始数据，  
-保存到memory\raw_datexxxx.jsonl
+并保存到memory\raw_datexxxx.jsonl
 
-第二：必须“稳定” ，需要对原始数据进行初步筛选
-技术方案是，压缩信息（embedding + cluster）
+第二：接着需要对原始数据进行初步筛选，这一步的要求是必须“稳定” ，
+采取的技术方案是，压缩信息（embedding + cluster）
 
 丢弃无关和重复内容
 
-## 步骤细节
+## 伪代码实现：
 ---------------------------
 ***python 去除噪音***
 ```code
@@ -60,9 +60,12 @@ flowchart TD
     E --> F[candidate events]
     F --> G[TO expert]
 ```
+## 数据存储位置
+数据源在 data_source.json配置,
+数据存储可在config.json里配置
 
 
-## 代码片段 
+## 部分代码片段 
 文本过滤
 ```python
 def is_valid(text):
@@ -86,7 +89,7 @@ def is_event(cluster):
 
 ```
 
-cluster to event 代码片段：
+cluster to event ：
 ```python
 for cluster in clusters:
     if cluster.size >= 2:
@@ -131,5 +134,20 @@ cluster_obj:
 cluster_obj 主要用来判断“这是一个潜在事件”
 event_obj 结构化后，用于 expert agent 做分析、打分、追踪
 event_obj 可附加派生指标（如 velocity、priority），cluster_obj 保留原始聚类信息
+
+## 重要提示：
+👉 保持“轻量、可控、稳健”，不要用 LLM 给每条信息打标签。 一定要记住：这是轻量化 pipeline 的设计思路：
+
+原始数据保留完整 → append-oneline JSONL
+轻量筛选 → Python 去噪音规则，保证稳定性
+embedding + clustering → 得到 cluster_obj，并转成最小 event_obj
+LLM summary → 只处理压缩后的 event_obj，用于初步筛选高价值事件
+expert agent → 在 event_obj 上做深度分析/打分/洞察，生成 impact_score
+
+关键点在于：
+
+pipeline 前半段轻量、稳定、不依赖 LLM
+cluster → event_obj 是数据整理，不是理解
+expert agent 才负责真正的洞察和决策--- 这不是我们现阶段要实现的。
 
 

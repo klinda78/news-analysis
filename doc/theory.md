@@ -1,4 +1,5 @@
-## How an event has tradable value:
+## How an event(data) has tradable value:
+文档帮助理解信息传播的过程和介入时机
 
 ```mermaid
 flowchart LR
@@ -10,7 +11,7 @@ flowchart LR
     Source2 --> Detection
     Source3 --> Detection
 
-    Detection --> Signal
+    Detection --> Trading-Signal
 ```
 
 
@@ -19,18 +20,18 @@ flowchart LR
 ```flowchart
 Phase 1 研究 / 弱信号 
 Phase 2 专家讨论 
-Phase 3 事件催化 
+Phase 3 事件催化 (重点关注)
 Phase 4 扩散 
-Phase 5 共识（已经晚了）
+Phase 5 共识（时机已晚）
 ```
-## Source types
+## Data essential types
 ```flowchart
 Idea content yard  \twitter -- narrative  
 Knowledge Market \google\bilibili  -- deep insign  
 Behavior Ma rket  \taobao\pingduoduo -- real demand  
 Expectation Market  *Polymarket** -- capital flow in
 ```
-## Resource types:
+## Data source types:
 ```flowchart
 entity_type:
 account   → KOL / 人 / 机构账号
@@ -38,7 +39,7 @@ webpage   → 页面
 api       → 数据接口
 dataset   → 数据集
 ```
-## Event types
+## Event classify
 ```flowchart
 Policy Event
 Supply Shock
@@ -48,7 +49,7 @@ Reputation Crisis
 Technology Breakthrough
 Macro Trigger
 ```
-## Event-driven multi-expert system
+## Event-driven multi-expert system workflow
 ```mermaid
 flowchart TD 
     A[Event Source]

@@ -69,7 +69,7 @@ async function fetchTextHttp(url) {
 async function fetchDataFromAPI(source) {
   const url = source?.access?.url;
   if (!isHttpUrl(url)) {
-    // Placeholder endpoint in current `data_resource.json`.
+    // Placeholder endpoint in current `data_source.json`.
     return { mock: true, kind: 'api', source };
   }
 

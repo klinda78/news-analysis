@@ -1,4 +1,14 @@
-invest-agent
+## 本文件帮助你理解多专家系统的agent的架构。
+当前多专家系统包含至少三个agent
+1：news-agent
+2:invest-agent
+3:content-agent
+
+### news-agent
+
+
+
+### invest-agent
 ```mermaid
 graph TD
     soul["soul.md\n(agent价值观、偏好)"] --> thinking_model["thinking_model.md\n(决策逻辑)"]

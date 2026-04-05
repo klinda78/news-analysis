@@ -1,5 +1,5 @@
 function parser(rawData, source) {
-  // The current `data_resource.json` uses fields like:
+  // The current `data_source.json` uses fields like:
   // - source.platform.name
   // - source.source_type / entity_type
   // - source.metadata.authority_score
@@ -8,7 +8,7 @@ function parser(rawData, source) {
     source?.platform?.name ?? source?.type ?? source?.id ?? ''
   ).toLowerCase();
 
-  // Optional parse strategy hint from `data_resource.json`.
+  // Optional parse strategy hint from `data_source.json`.
   // Example: { access: { parse: { type: "rss" | "next_data" | "css" | "nitter_search" } } }
   const parseType = String(source?.access?.parse?.type ?? '').toLowerCase();
 
