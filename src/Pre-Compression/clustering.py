@@ -7,7 +7,7 @@ import os
 
 # 后续你可以把 API KEY 放在 config.json 里，目前先从环境变量读取或者在此暂定硬编码
 ZHIPU_API_KEY = os.environ.get("ZHIPU_API_KEY", "your_api_key_here")  
-
+ 
 def get_zhipu_embeddings(texts):
     """
     使用智谱 API (embedding-3) 获取向量。

@@ -7,11 +7,33 @@ from clustering import cluster_texts
 from filter_candidate_event import is_event, format_event_obj
 from llm_summarize import llm_summarize
 
+def load_config():
+    # 动态获取当前文件所属路径 (src/Pre-Compression)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # 定位到父节点 src 文件夹
+    src_dir = os.path.dirname(current_dir)
+    config_path = os.path.join(src_dir, "config.json")
+    
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            return json.load(f), src_dir
+    return {}, src_dir
+
 def main():
-    # 绝对路径配置
-    base_dir = r"d:\onedriver\OneDrive\myproject\news-analysis\src\memory"
+    config, src_dir = load_config()
+    
+    # 彻底弃用绝对路径，改为相对 src 的动态路径拼接
+    raw_data_rel_path = config.get("raw_data_files_path", "./memory")
+    output_rel_path = config.get("output_files_path", "./output")
+    
+    base_dir = os.path.normpath(os.path.join(src_dir, raw_data_rel_path))
+    output_dir = os.path.normpath(os.path.join(src_dir, output_rel_path))
+    
+    # 确保输出目录存在
+    os.makedirs(output_dir, exist_ok=True)
+    
     input_file = os.path.join(base_dir, "rawdata_04012026.jsonl")
-    output_file = os.path.join(base_dir, "event_04012026.jsonl")
+    output_file = os.path.join(output_dir, "event_04012026.jsonl")
     
     if not os.path.exists(input_file):
         print(f"Missing file: {input_file}")
