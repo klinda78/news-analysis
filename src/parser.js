@@ -247,53 +247,49 @@ function parser(rawData, source) {
     }
   }
 
-  // Map platform -> event type used by `Pre-Compression/market_mapping.js`.
-  let event_type = 'Policy Event';
-  let topic_acceleration = 'medium';
-  let authority_signal = true;
-  let cross_platform = false;
+  const { randomUUID } = require('crypto');
+  const rawItems = [];
+  const now = Math.floor(Date.now() / 1000);
 
-  if (platform === 'x' || platform === 'twitter') {
-    event_type = 'Social Trend';
-    topic_acceleration = 'high';
-    cross_platform = true;
-  } else if (platform === 'polymarket') {
-    event_type = 'Capital Flow';
-    topic_acceleration = 'high';
-    cross_platform = true;
-  } else if (platform === 'google') {
-    event_type = 'Policy Event';
-    topic_acceleration = 'medium';
-    cross_platform = true;
-  } else if (platform === 'bilibili') {
-    event_type = 'Social Trend';
-    topic_acceleration = 'medium';
-    cross_platform = true;
-  } else if (platform === 'taobao') {
-    event_type = 'Demand Shock';
-    topic_acceleration = 'medium';
-    cross_platform = false;
-  } else {
-    // Unknown platform => do not produce an event yet.
-    return null;
+  if (platform === 'google' || parseType === 'rss') {
+    if (evidence && evidence.rss_titles) {
+      evidence.rss_titles.forEach(title => {
+        rawItems.push({
+          id: randomUUID ? randomUUID() : Math.random().toString(),
+          text: title,
+          timestamp: now,
+          source: source.id
+        });
+      });
+    }
+  } else if (platform === 'x' || platform === 'twitter' || parseType === 'nitter_search' || parseType === 'nitter_profile') {
+    if (evidence && evidence.tweets) {
+      evidence.tweets.forEach(t => {
+        rawItems.push({
+          id: randomUUID ? randomUUID() : Math.random().toString(),
+          text: t.text,
+          timestamp: t.created_at ? Math.floor(new Date(t.created_at).getTime() / 1000) : now,
+          source: source.id,
+          author: t.username || "unknown"
+        });
+      });
+    }
+  } else if (platform === 'polymarket' || parseType === 'next_data') {
+    if (evidence && evidence.markets) {
+      evidence.markets.forEach(m => {
+        const yesPct = m.yes_probability ? `(Yes: ${(m.yes_probability * 100).toFixed(1)}%)` : '';
+        const vol = m.volume_usd ? `[$${(m.volume_usd / 1000000).toFixed(1)}M]` : '';
+        rawItems.push({
+          id: randomUUID ? randomUUID() : Math.random().toString(),
+          text: `Polymarket: ${m.question} ${yesPct} ${vol}`.trim(),
+          timestamp: now,
+          source: source.id
+        });
+      });
+    }
   }
 
-  return {
-    event: 'AI监管/市场信号触发',
-    event_type,
-    participants,
-    topic_acceleration,
-    authority_signal,
-    cross_platform,
-    impact_score,
-    evidence,
-    source: {
-      id: source?.id,
-      platform,
-      entity_type: source?.entity_type,
-      source_type: source?.source_type,
-    },
-  };
+  return rawItems;
 }
 
 module.exports = parser;

@@ -1,28 +1,37 @@
-// data_ingestion.js
-
 const fetchData = require('./fetch_route');
 const parser = require('./parser');
-const { preFilter } = require('./Pre-Compression/pre_filter');
-const { marketMapping } = require('./Pre-Compression/market_mapping');
+const fs = require('fs');
+const path = require('path');
+const config = require('./config.json');
 
 module.exports = async function dataIngestion(source) {
   
   // 1️⃣ fetch raw
   const rawData = await fetchData(source);
+  if (!rawData) return 0;
 
-  if (!rawData) return null;
+  // 2️⃣ parse → extract minimal raw items (texts and sources)
+  const items = parser(rawData, source);
+  if (!items || items.length === 0) return 0;
 
-  // 2️⃣ parse → 标准结构
-  const event = parser(rawData, source);
-  if (!event) return null;
+  // 3️⃣ 落盘阶段
+  // 为了跟 Python 端模拟的静态测试衔接过渡，现阶段默认指向 `rawdata_04012026.jsonl`
+  // 未来可改为根据当日动态时间戳组装文件名
+  const outputFileName = `rawdata_04012026.jsonl`;
+  const outputDir = path.resolve(__dirname, config.raw_data_files_path || 'memory');
+  
+  if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+  }
+  
+  const outputPath = path.join(outputDir, outputFileName);
+  
+  let appendCount = 0;
+  for (const item of items) {
+      // 一行一个 JSON，供后面的 Python 管道吃
+      fs.appendFileSync(outputPath, JSON.stringify(item) + '\n');
+      appendCount++;
+  }
 
-  // 3️⃣ pre-compression filtering
-  const threshold = Number(process.env.EVENT_IMPACT_THRESHOLD ?? 20);
-  const passed = preFilter(event, threshold);
-  if (!passed) return null;
-
-  // 4️⃣ market mapping
-  const mapped = marketMapping(passed);
-
-  return mapped;
+  return appendCount;
 };
