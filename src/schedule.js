@@ -1,4 +1,4 @@
-const dataResources = require('./data_resource.json');
+const dataResources = require('./data_source.json');
 const ingest = require('./data_ingestion');
 
 function sleep(ms) {
@@ -30,7 +30,7 @@ async function run() {
     : dataResources?.data_sources;
 
   if (!Array.isArray(sources)) {
-    throw new Error('data_resource.json must be an array or contain { data_sources: [] }');
+    throw new Error('data_source.json must be an array or contain { data_sources: [] }');
   }
 
   for (const source of sources) {
