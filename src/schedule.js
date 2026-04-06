@@ -39,18 +39,8 @@ async function run() {
     try {
       console.log(`Fetching: ${source.id}`);
 
-      const result = await ingest(source);
-
-      let summary = result;
-      if (result && typeof result === 'object') {
-        if ('event' in result) summary = result.event;
-        else if ('event_brief' in result) {
-          const brief = result.event_brief ?? {};
-          const conf = result.confidence_score;
-          summary = `${brief.event} | ${brief.event_type} | conf=${conf}`;
-        }
-      }
-      console.log(`Done: ${source.id}`, summary || '');
+      const appendedCount = await ingest(source);
+      console.log(`Done: ${source.id} | Appended ${appendedCount || 0} raw JSON lines.`);
 
       // Hardcoded per-source pacing. If a source explicitly has `delay`, it wins.
       const delayMs = Number.isFinite(Number(source.delay))
