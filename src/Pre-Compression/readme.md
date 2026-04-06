@@ -138,16 +138,16 @@ event_obj 可附加派生指标（如 velocity、priority），cluster_obj 保�
 ## 重要提示：
 👉 保持“轻量、可控、稳健”，不要用 LLM 给每条信息打标签。 一定要记住：这是轻量化 pipeline 的设计思路：
 
-原始数据保留完整 → append-oneline JSONL
-轻量筛选 → Python 去噪音规则，保证稳定性
-embedding + clustering → 得到 cluster_obj，并转成最小 event_obj
-LLM summary → 只处理压缩后的 event_obj，用于初步筛选高价值事件
-expert agent → 在 event_obj 上做深度分析/打分/洞察，生成 impact_score
+原始数据保留完整 → append-oneline JSONL  
+轻量筛选 → Python 去噪音规则，保证稳定性  
+embedding + clustering → 得到 cluster_obj，并转成最小 event_obj  
+LLM summary → 只处理压缩后的 event_obj，用于初步筛选高价值事件  
+expert agent → 在 event_obj 上做深度分析/打分/洞察，生成 impact_score  
 
-关键点在于：
+关键点在于：  
 
-pipeline 前半段轻量、稳定、不依赖 LLM
-cluster → event_obj 是数据整理，不是理解
-expert agent 才负责真正的洞察和决策--- 这不是我们现阶段要实现的。
+pipeline 前半段轻量、稳定、不依赖 LLM  
+cluster → event_obj 是数据整理，不是理解  
+expert agent 才负责真正的洞察和决策--- 这不是我们现阶段要实现的。  
 
 
