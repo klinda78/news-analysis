@@ -1,8 +1,9 @@
 {
-  "name": "x-platform-crawler",
+  "name": "@klinda78/x-crawler",
   "version": "1.0.0",
   "description": "X平台数据抓取工具，使用Playwright Persistent Context进行会话管理",
   "main": "src/index.js",
+  "bin": {"x-crawler": "bin/start.js"},
   "scripts": {
     "start": "node src/index.js",
     "test:login": "node tests/manual-login-test.js",

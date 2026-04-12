@@ -18,6 +18,8 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@steipete/sweet-cookie": "0.2.0"
+    "@steipete/sweet-cookie": "0.2.0",
+    "@klinda78/x-crawler": "file:./x-platform-crawler"
+
   }
 }

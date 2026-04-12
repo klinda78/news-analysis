@@ -147,6 +147,7 @@ async function fetchDataFromOAuthAPI(source) {
 }
 
 async function fetchDataFromWeb(source) {
+    //  google
   const url = source?.access?.url;
   if (!isHttpUrl(url)) return { mock: true, kind: 'web', source };
 

@@ -1,5 +1,13 @@
 const dataResources = require('./data_source.json');
-const ingest = require('./data_ingestion');
+const { ingest, shutdown } = require('./data_ingestion');
+
+
+// 优雅关闭
+process.on('SIGINT', async () => {
+  console.log('\n正在关闭...');
+  await shutdown(); // 关闭常驻爬虫
+  process.exit(0);
+});
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

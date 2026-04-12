@@ -101,8 +101,9 @@
       "name": "x",
       "has_api": false
     },
+    "module": "x-crawler",
     "access": {
-      "mode": "scraper",
+      "mode": "x-crawler",
       "url": "https://x.com",
       "selectors": {
          "tweet": "article",
@@ -112,38 +113,6 @@
 },
       "parse": {
         "type": "cookie_profile",
-        "note": "抓取每个账号主页最新推文（文本+时间+链接），不依赖 X API"
-      }
-    },
-    "frequency": "medium",
-    "priority": 2,
-    "metadata": {
-      "authority_score": 0.9,
-      "region": "global"
-    }
-  },
-  {
-    "id": "x_bigshots_nitter",
-    "active": false,
-    "entity_type": "account",
-    "trigger_mode": "pull",
-    "targets": ["RaoulGMI","LynAldenContact","JulianMI2","crossbordercap","LukeGromen","42macro","DiMartinoBooth","biancoresearch","EconguyRosie","MacroAlf"],
-    "source_type": "idea",
-    "signal_type": ["narrative", "social_trend"],
-    "platform": {
-      "name": "x",
-      "has_api": false
-    },
-    "access": {
-      "mode": "session_browser",
-      "url": "https://x.com",
-      "selectors": {
-        "tweet_text": ".tweet-content",
-        "tweet_link": "a.tweet-link",
-        "tweet_time": ".tweet-date a[title]"
-      },
-      "parse": {
-        "type": "x_profile",
         "note": "抓取每个账号主页最新推文（文本+时间+链接），不依赖 X API"
       }
     },
