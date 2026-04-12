@@ -1,46 +1,4 @@
-[{
-    "id": "twitter_ai_topic",
-    "active": false,
-    "entity_type": "account",
-    "trigger_mode" : "pull",
-    "targets": [
-    "elonmusk",
-    "sama",
-    "naval",
-    "balajis",
-    "paulg",
-    "raydalio",
-    "elonmusk",
-    "federalreserve",
-    "ecb",
-    "imfnews"],
-    "source_type": "idea",
-  
-    "signal_type": ["narrative", "tech_trend"],
-  
-    "platform": {
-      "name": "twitter",
-      "has_api": true
-    },
-  
-    "access": {
-      "mode": "api",
-      "url": "twitter search endpoint",
-      "selectors": null,
-      "parse": {
-        "type": "x_api_v2_search",
-        "note": "需要 Bearer Token；当前仅占位，未接入真实 X API"
-      }
-    },
-  
-    "frequency": "high",
-    "priority": 1,
-    "metadata": {
-        "authority_score": 0.95,
-        "region": "global"
-      }
-  },
-
+[
   {
     "id": "fed_policy",
     "active": false,
@@ -144,15 +102,15 @@
       "has_api": false
     },
     "access": {
-      "mode": "scraper",
-      "url": "https://xcancel.com",
+      "mode": "session_browser",
+      "url": "https://x.com",
       "selectors": {
         "tweet_text": ".tweet-content",
         "tweet_link": "a.tweet-link",
         "tweet_time": ".tweet-date a[title]"
       },
       "parse": {
-        "type": "nitter_profile",
+        "type": "x_profile",
         "note": "抓取每个账号主页最新推文（文本+时间+链接），不依赖 X API"
       }
     },
