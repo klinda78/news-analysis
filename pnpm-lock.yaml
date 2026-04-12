@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@steipete/sweet-cookie':
+        specifier: 0.2.0
+        version: 0.2.0
+
+packages:
+
+  '@steipete/sweet-cookie@0.2.0':
+    resolution: {integrity: sha512-R6kkmWZe36gysj0oET8v7ZQ3aZ6GxLU+ssD1BMomy53Au1Ax9LZ4g1pWE5FLgAD9nX6Y5VYjbn9kc5UZpG776Q==}
+    engines: {node: '>=22'}
+
+snapshots:
+
+  '@steipete/sweet-cookie@0.2.0': {}

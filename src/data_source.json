@@ -89,12 +89,45 @@
       "region": "global"
     }
   },
-  {
+    {
     "id": "x_bigshots_latest",
     "active": true,
     "entity_type": "account",
     "trigger_mode": "pull",
-    "targets": ["elonmusk", "sama", "samaltman", "naval"],
+    "targets": ["RaoulGMI","LynAldenContact","JulianMI2","crossbordercap","LukeGromen","42macro","DiMartinoBooth","biancoresearch","EconguyRosie","MacroAlf"],
+    "source_type": "idea",
+    "signal_type": ["narrative", "social_trend"],
+    "platform": {
+      "name": "x",
+      "has_api": false
+    },
+    "access": {
+      "mode": "scraper",
+      "url": "https://x.com",
+      "selectors": {
+         "tweet": "article",
+         "text ":  "[data-testid=\"tweetText\"]",
+         "time ": "time",
+         "link ":  "a[href*=\"/status/\"] "
+},
+      "parse": {
+        "type": "cookie_profile",
+        "note": "抓取每个账号主页最新推文（文本+时间+链接），不依赖 X API"
+      }
+    },
+    "frequency": "medium",
+    "priority": 2,
+    "metadata": {
+      "authority_score": 0.9,
+      "region": "global"
+    }
+  },
+  {
+    "id": "x_bigshots_nitter",
+    "active": false,
+    "entity_type": "account",
+    "trigger_mode": "pull",
+    "targets": ["RaoulGMI","LynAldenContact","JulianMI2","crossbordercap","LukeGromen","42macro","DiMartinoBooth","biancoresearch","EconguyRosie","MacroAlf"],
     "source_type": "idea",
     "signal_type": ["narrative", "social_trend"],
     "platform": {

@@ -1,0 +1,23 @@
+{
+  "name": "news-analysis-fetcher",
+  "version": "1.0.0",
+  "description": "Lightweight Node.js data ingestion layer for news analysis",
+  "main": "src/schedule.js",
+  "scripts": {
+    "start": "node src/schedule.js",
+    "test:fetch": "node src/test/test_x_fetch.js"
+  },
+  "keywords": [
+    "news",
+    "fetcher",
+    "ingestion"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@steipete/sweet-cookie": "0.2.0"
+  }
+}
