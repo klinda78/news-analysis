@@ -39,30 +39,81 @@ async function runWithConcurrency(items, limit, fn) {
   return results;
 }
 
+const FETCH_TIMEOUT_MS = 15000;
+
+const cookieCache = new Map();
+
+async function getCookieForUrl(targetUrl) {
+  const origin = originOf(targetUrl);
+  if (!origin) return '';
+  
+  if (cookieCache.has(origin)) {
+    return cookieCache.get(origin);
+  }
+
+  let cookieHeader = '';
+  try {
+    const { getCookies, toCookieHeader } = await import('@steipete/sweet-cookie');
+    const { cookies,warnings } = await getCookies({
+      url: origin,
+      browsers: ["chrome", "edge", "firefox", "safari", "brave"]
+    });
+    for (const w of warnings) console.warn(w);
+    cookieHeader = toCookieHeader(cookies, { dedupeByName: true });
+  } catch (err) {
+    console.warn(`[Fetcher] Failed to get sweet-cookie for ${origin}:`, err.message);
+  }
+  
+  cookieCache.set(origin, cookieHeader);
+  return cookieHeader;
+}
+
 async function fetchTextHttp(url) {
+  const cookieHeader = await getCookieForUrl(url);
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36';
+
   // Prefer global `fetch` if available (Node 18+).
   if (typeof fetch === 'function') {
-    const res = await fetch(url, {
-      headers: {
-        // Some sites return reduced content without a UA.
-        'user-agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36',
-        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
-      },
-    });
-    return await res.text();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const headers = {
+        'user-agent': userAgent,
+        'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      };
+      if (cookieHeader) headers['cookie'] = cookieHeader;
+
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers,
+      });
+
+      if (!res.ok) {
+        console.warn(`[Fetcher] Fetch failed for ${url}: ${res.status} ${res.statusText}`);
+      }
+      return await res.text();
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   // Fallback to https for older Node versions.
   return new Promise((resolve, reject) => {
-    https
-      .get(url, (res) => {
+    const headers = { 'user-agent': userAgent };
+    if (cookieHeader) headers['cookie'] = cookieHeader;
+
+    const req = https
+      .get(url, { timeout: FETCH_TIMEOUT_MS, headers }, (res) => {
         let data = '';
         res.setEncoding('utf8');
         res.on('data', (chunk) => (data += chunk));
         res.on('end', () => resolve(data));
       })
-      .on('error', reject);
+      .on('error', reject)
+      .on('timeout', () => {
+        req.destroy(new Error(`Request timed out after ${FETCH_TIMEOUT_MS}ms`));
+      });
   });
 }
 
@@ -104,15 +155,28 @@ async function fetchDataFromWeb(source) {
 
     // Special case: X/nitter-style profile fetching for multiple usernames.
     // `access.url` is treated as the base origin, e.g. "https://xcancel.com".
-    if (parseType === 'nitter_profile' && Array.isArray(source?.targets) && source.targets.length) {
+    if (parseType === 'cookie_profile' && Array.isArray(source?.targets) && source.targets.length) {
       const baseOrigin = originOf(url) || url.replace(/\/+$/, '');
       const usernames = source.targets.map((t) => String(t).trim()).filter(Boolean);
 
-      const profiles = await runWithConcurrency(usernames, 2, async (username) => {
+      const profiles = await runWithConcurrency(usernames, 1, async (username) => {
         const profileUrl = `${baseOrigin}/${encodeURIComponent(username)}`;
         try {
+          // fetchTextHttp now might return 403/404 content
           const html = await fetchTextHttp(profileUrl);
-          return { username, url: profileUrl, mock: false, html };
+        
+          await new Promise(r => setTimeout(r, 3500 + Math.random() * 5000));
+          console.log('Start', username);
+          // If the page is too small or contains error signatures, mark as mock/error
+          const isErrorPage = html.length < 500 && (html.includes('403 Forbidden') || html.includes('Rate limit'));
+          
+          return { 
+            username, 
+            url: profileUrl, 
+            mock: isErrorPage, 
+            html,
+            error: isErrorPage ? 'Access denied (403/RateLimit)' : null 
+          };
         } catch (err) {
           return { username, url: profileUrl, mock: true, error: err?.message ?? String(err) };
         }
@@ -135,6 +199,7 @@ async function fetchDataFromBrowser(source) {
 }
 
 module.exports = {
+  originOf,
   fetchDataFromAPI,
   fetchDataFromOAuthAPI,
   fetchDataFromWeb,
