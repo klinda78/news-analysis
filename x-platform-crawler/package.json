@@ -1,0 +1,28 @@
+{
+  "name": "x-platform-crawler",
+  "version": "1.0.0",
+  "description": "X平台数据抓取工具，使用Playwright Persistent Context进行会话管理",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test:login": "node tests/manual-login-test.js",
+    "clean": "node scripts/clean.js",
+    "install:playwright": "npx playwright install chromium"
+  },
+  "keywords": [
+    "x-platform",
+    "crawler",
+    "playwright",
+    "session-manager"
+  ],
+  "author": "Quantitative Trading Agent",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "playwright": "^1.58.2",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

@@ -1,0 +1,30 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 私人信息
+*profile*/
+
+# 构建输出
+dist/
+build/
+*.exe
+
+# 环境
+.env
+.env.local
+.env.*.local
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 操作系统
+.DS_Store
+Thumbs.db
