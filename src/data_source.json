@@ -101,7 +101,7 @@
       "name": "x",
       "has_api": false
     },
-    "module": "x-crawler",
+    "module": "@klinda78/x-crawler",
     "access": {
       "mode": "x-crawler",
       "url": "https://x.com",
