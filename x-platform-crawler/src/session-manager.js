@@ -67,7 +67,10 @@ class SessionManager {
       
       // 启动登录状态监控
       this.startLoginMonitor();
-      
+      let msg = {
+        type:"session_ready"
+      }
+      console.log(JSON.stringify(msg));
       logger.success('Session Manager初始化完成');
       return true;
     } catch (error) {
@@ -321,6 +324,10 @@ class SessionManager {
     }
 
     this.running = false;
+    let msg = {
+      type:"data_ready"
+    }
+    console.log(JSON.stringify(msg));
     logger.info('队列任务执行完成');
   }
 

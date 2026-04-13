@@ -66,7 +66,7 @@ async function startCrawlerProcess(source, outputDir) {
     for (const line of lines) {
       try {
         const msg = JSON.parse(line);
-        if (msg.type === 'ready') info.ready = true;
+        if (msg.type === 'session_ready') info.ready = true;
         if (msg.type === 'data_ready') info.pendingFiles.push(msg.file);
       } catch {
         console.log(`[${source.id}] ${line}`);
@@ -82,7 +82,7 @@ async function startCrawlerProcess(source, outputDir) {
         resolve();
       }
     }, 100);
-    setTimeout(() => reject(new Error('启动超时')), 30000);
+    setTimeout(() => reject(new Error('启动超时')), 60000);
   });
   
   crawlerProcesses.set(source.id, info);
