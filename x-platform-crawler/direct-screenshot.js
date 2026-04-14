@@ -18,7 +18,7 @@ async function directScreenshot() {
   try {
 
     
-    // 1. 启动Chrome
+    // 1. Persistent 模式启动Chrome
     console.log('2. 启动Chrome...');
     const context = await chromium.launchPersistentContext(userDataDir, {
       executablePath: chromePath,

@@ -5,6 +5,9 @@ This project is a decoupled news analysis system consisting of a Node.js data in
 ## Project Structure
 
 - `src/`: Core logic
+  - `config.js`: Configuration file.
+  - `memory/`: Memory storage for raw data.
+  - `data_resources.json`: Data source configuration file.
   - `Fetcher.js`: Low-level data fetching logic (HTTPS/Scraping).
   - `data_ingestion.js`: Logic to parse and save raw data as JSONL.
   - `schedule.js`: Main entry point for the Node.js fetcher (runs on a loop).
@@ -28,6 +31,18 @@ npm install
 # Start the fetcher loop
 npm start
 ```
+#### 首次运行
+*浏览器会打开，请手动登录X平台：**
+1. 输入账号密码登录
+2. 完成二次验证（如果有）
+3. 登录成功后，**不要关闭浏览器**
+4. 程序会自动检测登录状态并保存cookies
+5. 看到"登录状态已保存"提示后，可以关闭浏览器
+
+#### 下次启动 修改config.js
+1. 将 `config.js` 中的 `headless` 改为 `true`
+2. 重新运行：`npm start`
+3. 程序会自动每20分钟抓取一次数据
 
 ### 3. Setup Python (Pre-Compression Pipeline)
 From the root directory:
