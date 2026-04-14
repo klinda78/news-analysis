@@ -5,12 +5,13 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
+const CONFIG = require('./config');
 
 async function fetchMuskTweetsToday() {
   console.log('=== 开始抓取马斯克今天推文 ===\n');
   
-  const chromePath = 'D:\\infra\\Chrome-portable\\chrome.exe';
-  const userDataDir = 'D:\\infra\\Chrome-portable\\Data';
+  const chromePath = CONFIG.chromeExecutablePath();
+  const userDataDir = CONFIG.dataDir;
   const muskUrl = 'https://x.com/elonmusk';
   
   let browser = null;

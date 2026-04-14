@@ -55,7 +55,7 @@ const CONFIG = {
   logFile: "./logs/crawler.log",
   
   // === 数据存储 ===
-  
+  dataDir: "./data",
   dataFile: "./data/x_data.jsonl",
   
   // === 监控配置 ===

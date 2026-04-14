@@ -4,12 +4,13 @@
  * 最终验证 - 直接检查页面内容
  */
 const { chromium } = require('playwright');
+const CONFIG = require('./config');
 
 async function finalVerification() {
   console.log('=== 最终登录状态验证 ===\n');
   
-  const chromePath = 'D:\\infra\\Chrome-portable\\chrome.exe';
-  const chromeDataDir = 'D:\\infra\\Chrome-portable\\Data';
+  const chromePath = chromium.executablePath();
+  const chromeDataDir = CONFIG.dataDir;
   
   console.log('使用正确的profile路径启动...\n');
   

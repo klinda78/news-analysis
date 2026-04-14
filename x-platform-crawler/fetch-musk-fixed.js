@@ -5,31 +5,20 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
+const CONFIG = require('./config');
 
 async function fetchMuskTweetsFixed() {
   console.log('=== 开始抓取马斯克今天推文（修复版）===\n');
   
-  const chromePath = 'D:\\infra\\Chrome-portable\\chrome.exe';
-  const userDataDir = 'D:\\infra\\Chrome-portable\\Data';
+  const chromePath = chromium.executablePath;
+  const userDataDir = CONFIG.dataDir;
   const muskUrl = 'https://x.com/elonmusk';
-  const versionDllPath = 'D:\\infra\\Chrome-portable\\version.dll';
-  const versionDllBackup = 'D:\\infra\\Chrome-portable\\version.dll.backup';
-  
+
   let browser = null;
   let page = null;
-  let versionDllRemoved = false;
   
   try {
-    // 1. 处理version.dll冲突
-    console.log('1. 处理Chrome++ version.dll冲突...');
-    if (fs.existsSync(versionDllPath)) {
-      console.log('  发现version.dll，临时重命名...');
-      fs.renameSync(versionDllPath, versionDllBackup);
-      versionDllRemoved = true;
-      console.log('  ✅ version.dll已重命名为version.dll.backup');
-    } else {
-      console.log('  ✅ version.dll不存在，无需处理');
-    }
+
     
     // 2. 启动Chrome-portable
     console.log('\n2. 启动Chrome-portable...');
@@ -252,15 +241,6 @@ async function fetchMuskTweetsFixed() {
       console.error('关闭资源时出错:', closeError.message);
     }
     
-    // 恢复version.dll
-    try {
-      if (versionDllRemoved && fs.existsSync(versionDllBackup)) {
-        fs.renameSync(versionDllBackup, versionDllPath);
-        console.log('✅ version.dll已恢复');
-      }
-    } catch (recoveryError) {
-      console.error('恢复version.dll失败:', recoveryError.message);
-    }
   }
 }
 
