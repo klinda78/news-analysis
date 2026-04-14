@@ -324,10 +324,7 @@ class SessionManager {
     }
 
     this.running = false;
-    let msg = {
-      type:"data_ready"
-    }
-    console.log(JSON.stringify(msg));
+    // 通知已移至 saveData 中，实现按批次通知
     logger.info('队列任务执行完成');
   }
 
@@ -416,13 +413,26 @@ class SessionManager {
         crawled_at: timestamp,
         platform: 'x'
       })).join('\n') + '\n';
-      let dataFile = CONFIG.dataFile;
+      
+      let outputDir = CONFIG.dataFile;
       if (process.env.CRAWLER_OUTPUT_DIR) {
-        dataFile = process.env.CRAWLER_OUTPUT_DIR;
+        outputDir = process.env.CRAWLER_OUTPUT_DIR;
       }
-      dataFile += '/x_data.jsonl';
+      
+      // 使用唯一文件名，防止被主模块 unlink 后覆盖或丢失
+      const filename = `x-${Date.now()}-${Math.random().toString(36).substr(2, 5)}.jsonl`;
+      const dataFile = path.resolve(outputDir, filename);
+      
       await fs.appendFile(dataFile, lines, 'utf8');
       logger.debug(`数据已保存到: ${dataFile} (${data.length}条)`);
+      
+      // 通知主程序
+      console.log(JSON.stringify({
+        type: 'data_ready',
+        file: dataFile,
+        timestamp: Date.now()
+      }));
+      
     } catch (error) {
       logger.fail('保存数据失败', { error: error.message });
     }

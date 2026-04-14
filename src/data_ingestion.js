@@ -61,32 +61,62 @@ async function startCrawlerProcess(source, outputDir) {
     pendingFiles: []
   };
   
-  proc.stdout.on('data', (data) => {
-    const lines = data.toString().trim().split('\n');
+  // 必须立即加入管理，否则启动超时会导致进程“失联”无法关闭
+  crawlerProcesses.set(source.id, info);
+
+  let stdoutBuffer = '';
+  proc.stdout.on('data', (chunk) => {
+    stdoutBuffer += chunk.toString();
+    const lines = stdoutBuffer.split('\n');
+    stdoutBuffer = lines.pop(); // 保持最后一行（可能不完整）在 buffer 中
+
     for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+
       try {
-        const msg = JSON.parse(line);
-        if (msg.type === 'session_ready') info.ready = true;
-        if (msg.type === 'data_ready') info.pendingFiles.push(msg.file);
+        const msg = JSON.parse(trimmedLine);
+        // 兼容不同的就绪信号
+        if (msg.type === 'session_ready' || msg.type === 'ready') {
+          info.ready = true;
+        }
+        if (msg.type === 'data_ready') {
+          if (msg.file) {
+            info.pendingFiles.push(msg.file);
+          } else {
+            console.log(`[${source.id}] 收到数据就绪信号，等待文件同步...`);
+          }
+        }
       } catch {
-        console.log(`[${source.id}] ${line}`);
+        // 非 JSON 输出，直接作为日志打印
+        console.log(`[${source.id}] ${trimmedLine}`);
       }
     }
   });
-  
-  // 等待就绪
-  await new Promise((resolve, reject) => {
-    const check = setInterval(() => {
-      if (info.ready) {
-        clearInterval(check);
-        resolve();
-      }
-    }, 100);
-    setTimeout(() => reject(new Error('启动超时')), 60000);
+
+  proc.stderr.on('data', (data) => {
+    console.error(`[${source.id} ERROR] ${data.toString().trim()}`);
   });
   
-  crawlerProcesses.set(source.id, info);
-  console.log(`[${source.id}] 常驻进程就绪`);
+  // 等待就绪
+  try {
+    await new Promise((resolve, reject) => {
+      const check = setInterval(() => {
+        if (info.ready) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 100);
+      setTimeout(() => {
+        clearInterval(check);
+        reject(new Error('启动超时，请检查子模块日志'));
+      }, 60000);
+    });
+    console.log(`[${source.id}] 常驻进程就绪`);
+  } catch (err) {
+    console.warn(`[${source.id}] ${err.message}`);
+    // 虽然超时，但 info 已经加入 crawlerProcesses，主进程退出请求时仍会尝试关闭它
+  }
 }
 
 async function processCrawlerOutput(info, sourceId, outputDir) {
