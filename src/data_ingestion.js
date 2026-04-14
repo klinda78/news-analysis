@@ -84,7 +84,11 @@ async function startCrawlerProcess(source, outputDir) {
     if (t.startsWith('http')) return t;
     return `https://x.com/${t}`;
   });
-  const crawlerConfig = { targets };
+  const topicsFilePath = (source.topics || []).map(t => {
+    if (t.startsWith('http')) return t;
+    return `https://x.com/search?q=${t}`;
+  });
+  const crawlerConfig = { targets: targetsFilePath.concat(topicsFilePath) };
   const configPath = path.resolve(__dirname, `crawler-config-${source.id}.json`);
   fs.writeFileSync(configPath, JSON.stringify(crawlerConfig, null, 2));
 
