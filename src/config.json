@@ -2,5 +2,6 @@
   "raw_data_files_path": "./memory",
   "output_files_path": "./output",
   "candidat_events_file": "./memory.jsonl",
-  "data_resources_file": "./data_resources.json"
+  "data_resources_file": "./data_resources.json",
+  "targets_file": "./x_targets.json"
 }

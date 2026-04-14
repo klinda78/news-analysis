@@ -62,6 +62,7 @@ async function shutdown() {
 };
 
 async function ingestFromCrawlerPersistent(source) {
+  const config = require('./config.json');
   const outputDir = path.resolve(__dirname, config.raw_data_files_path || 'memory');
   
   // 首次启动
@@ -79,7 +80,7 @@ async function startCrawlerProcess(source, outputDir) {
   const modulePath = require.resolve(`${source.module}/bin/start.js`);  //data_source.json里必须配置有：module字段, root/package.json里必须软链到实际包位置
   
   // 生成子模块专用配置文件
-  const targets = (source.targets || []).map(t => {
+  const targetsFilePath = (source.targets || []).map(t => {
     if (t.startsWith('http')) return t;
     return `https://x.com/${t}`;
   });
