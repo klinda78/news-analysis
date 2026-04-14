@@ -416,9 +416,13 @@ class SessionManager {
         crawled_at: timestamp,
         platform: 'x'
       })).join('\n') + '\n';
-      
-      await fs.appendFile(CONFIG.dataFile, lines, 'utf8');
-      logger.debug(`数据已保存到: ${CONFIG.dataFile} (${data.length}条)`);
+      let dataFile = CONFIG.dataFile;
+      if (process.env.CRAWLER_OUTPUT_DIR) {
+        dataFile = process.env.CRAWLER_OUTPUT_DIR;
+      }
+      dataFile += '/x_data.jsonl';
+      await fs.appendFile(dataFile, lines, 'utf8');
+      logger.debug(`数据已保存到: ${dataFile} (${data.length}条)`);
     } catch (error) {
       logger.fail('保存数据失败', { error: error.message });
     }
