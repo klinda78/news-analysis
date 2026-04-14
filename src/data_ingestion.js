@@ -77,13 +77,24 @@ async function ingestFromCrawlerPersistent(source) {
 
 async function startCrawlerProcess(source, outputDir) {
   const modulePath = require.resolve(`${source.module}/bin/start.js`);  //data_source.json里必须配置有：module字段, root/package.json里必须软链到实际包位置
+  
+  // 生成子模块专用配置文件
+  const targets = (source.targets || []).map(t => {
+    if (t.startsWith('http')) return t;
+    return `https://x.com/${t}`;
+  });
+  const crawlerConfig = { targets };
+  const configPath = path.resolve(__dirname, `crawler-config-${source.id}.json`);
+  fs.writeFileSync(configPath, JSON.stringify(crawlerConfig, null, 2));
+
   // 把环境变量从主程序传递给子模块
   const proc = spawn('node', [modulePath], {
     env: {
       ...process.env,
       PARENT_PID: process.pid,
       CRAWLER_OUTPUT_DIR: outputDir,
-      CRAWL_INTERVAL_MS: String(source.interval || 30 * 60 * 1000)
+      CRAWL_INTERVAL_MS: String(source.interval || 30 * 60 * 1000),
+      CRAWLER_CONFIG_FILE: configPath
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -137,6 +148,10 @@ async function startCrawlerProcess(source, outputDir) {
   proc.on('exit', (code) => {
     if (!info.ready) {
       exitError = new Error(`子进程意外退出，退出码: ${code}`);
+    }
+    // 清理临时配置文件
+    if (fs.existsSync(configPath)) {
+      try { fs.unlinkSync(configPath); } catch {}
     }
     crawlerProcesses.delete(source.id);
   });

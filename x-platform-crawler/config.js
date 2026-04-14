@@ -44,11 +44,28 @@ const CONFIG = {
   
   // === 目标URLs ===
   
-  targets: [
-    "https://x.com/Danny_Crypton",
-    "https://x.com/search?q=Powell"
-  ],
-  
+targets: (() => {
+  // 1. 检查环境变量是否存在
+  const configPath = process.env.CRAWLER_CONFIG_FILE;
+  if (!configPath) return ["https://x.com/Danny_Crypton", "https://x.com/search?q=Powell"];
+
+  try {
+    const fs = require('fs');
+    // 2. 读取并解析 JSON
+    const { targets = [], topics = [] } = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+    // 3. 映射逻辑：注意 URL 拼接的细节
+    const userUrls = targets.map(name => `https://x.com/${name.replace(/^@/, '')}`); 
+    const searchUrls = topics.map(term => `https://x.com/search?q=${encodeURIComponent(term)}`);
+
+    // 4. 合并结果
+    return [...userUrls, ...searchUrls];
+  } catch (err) {
+    // 5. 即使文件读报错，也保证返回一个基础数组，不让爬虫程序崩溃
+    console.error(`[Config Error] ${err.message}`);
+    return ["https://x.com/search?q=Powell"];
+  }
+})(),
   // === 日志配置 ===
   
   logLevel: "info",
