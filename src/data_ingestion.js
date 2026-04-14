@@ -21,8 +21,42 @@ async function dataIngestion(source) {
 
 // 关闭所有常驻进程
 async function shutdown() {
+  const promises = [];
   for (const [id, info] of crawlerProcesses) {
-    info.process.kill('SIGTERM');
+    promises.push(new Promise((resolve) => {
+      const proc = info.process;
+      let finished = false;
+
+      const done = () => {
+        if (!finished) {
+          finished = true;
+          resolve();
+        }
+      };
+
+      proc.on('exit', done);
+      proc.on('close', done);
+
+      // 在 Windows 上，child.kill() 是立即终止。
+      // 因为 Ctrl+C 会同时发给主进程和子进程，子进程已经在处理 SIGINT 了。
+      // 我们等待其自行关闭，如果超时还没关掉再强制杀掉。
+      if (process.platform === 'win32') {
+        setTimeout(() => {
+          if (!finished) {
+            proc.kill(); 
+            done();
+          }
+        }, 8000); // 给 8 秒时间清理，Playwright 启动/关闭较慢
+      } else {
+        proc.kill('SIGTERM');
+        setTimeout(done, 8000);
+      }
+    }));
+  }
+  
+  if (promises.length > 0) {
+    console.log(`正在等待 ${promises.length} 个子进程关闭...`);
+    await Promise.all(promises);
   }
   crawlerProcesses.clear();
 };
@@ -79,6 +113,7 @@ async function startCrawlerProcess(source, outputDir) {
         // 兼容不同的就绪信号
         if (msg.type === 'session_ready' || msg.type === 'ready') {
           info.ready = true;
+          console.log(`[${source.id}] 收到就绪信号`);
         }
         if (msg.type === 'data_ready') {
           if (msg.file) {
@@ -97,6 +132,14 @@ async function startCrawlerProcess(source, outputDir) {
   proc.stderr.on('data', (data) => {
     console.error(`[${source.id} ERROR] ${data.toString().trim()}`);
   });
+
+  let exitError = null;
+  proc.on('exit', (code) => {
+    if (!info.ready) {
+      exitError = new Error(`子进程意外退出，退出码: ${code}`);
+    }
+    crawlerProcesses.delete(source.id);
+  });
   
   // 等待就绪
   try {
@@ -105,6 +148,10 @@ async function startCrawlerProcess(source, outputDir) {
         if (info.ready) {
           clearInterval(check);
           resolve();
+        }
+        if (exitError) {
+          clearInterval(check);
+          reject(exitError);
         }
       }, 100);
       setTimeout(() => {
