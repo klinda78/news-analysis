@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const config = require('./config.json');
+const { profileDir } = require('../x-platform-crawler/config');
 
 // 常驻爬虫管理
 const crawlerProcesses = new Map();
@@ -63,7 +63,8 @@ async function shutdown() {
 
 async function ingestFromCrawlerPersistent(source) {
   const config = require('./config.json');
-  const outputDir = path.resolve(__dirname, config.raw_data_files_path || 'memory');
+  const toAbsPath = require('./utils/path.util');
+  const outputDir = toAbsPath(config.output_files_path ?? './memory');
   
   // 首次启动
   if (!crawlerProcesses.has(source.id)) {
@@ -80,24 +81,27 @@ async function startCrawlerProcess(source, outputDir) {
   const modulePath = require.resolve(`${source.module}/bin/start.js`);  //data_source.json里必须配置有：module字段, root/package.json里必须软链到实际包位置
   
   // 生成子模块专用配置文件
-  const targetsFilePath = (source.targets || []).map(t => {
+  const targetsUrls = (source.targets || []).map(t => {
     if (t.startsWith('http')) return t;
     return `https://x.com/${t}`;
   });
-  const topicsFilePath = (source.topics || []).map(t => {
+  const topicsUrls = (source.topics || []).map(t => {
     if (t.startsWith('http')) return t;
     return `https://x.com/search?q=${t}`;
   });
-  const crawlerConfig = { targets: targetsFilePath.concat(topicsFilePath) };
+  const crawlerTargetsConfig = { targets: targetsUrls.concat(topicsUrls) };
   const configPath = path.resolve(__dirname, `crawler-config-${source.id}.json`);
-  fs.writeFileSync(configPath, JSON.stringify(crawlerConfig, null, 2));
+  fs.writeFileSync(configPath, JSON.stringify(crawlerTargetsConfig, null, 2));
 
   // 把环境变量从主程序传递给子模块
+  const config = require('../config.json');
   const proc = spawn('node', [modulePath], {
     env: {
       ...process.env,
       PARENT_PID: process.pid,
-      CRAWLER_OUTPUT_DIR: outputDir,
+      LOG_DIR: config.logDir,
+      PROFILE_DIR: config.profileDir,
+      CRAWLER_OUTPUT_DIR: config.crawler_output_dir,
       CRAWL_INTERVAL_MS: String(source.interval || 30 * 60 * 1000),
       CRAWLER_CONFIG_FILE: configPath
     },

@@ -46,6 +46,7 @@ class SessionManager {
       }
       
       // 启动Persistent Context
+ 
       logger.info(`正在启动Persistent Context，profile目录: ${CONFIG.profileDir}`);
       logger.debug('启动选项:', launchOptions);
       
@@ -83,6 +84,7 @@ class SessionManager {
    * 确保profile目录存在
    */
   async ensureProfileDir() {
+
     try {
       await fs.access(CONFIG.profileDir);
       logger.info(`Profile目录已存在: ${CONFIG.profileDir}`);
@@ -414,14 +416,10 @@ class SessionManager {
         platform: 'x'
       })).join('\n') + '\n';
       
-      let outputDir = CONFIG.dataFile;
-      if (process.env.CRAWLER_OUTPUT_DIR) {
-        outputDir = process.env.CRAWLER_OUTPUT_DIR;
-      }
-      
+     const dataDir = CONFIG.dataDir;
       // 使用唯一文件名，防止被主模块 unlink 后覆盖或丢失
       const filename = `x-${Date.now()}-${Math.random().toString(36).substr(2, 5)}.jsonl`;
-      const dataFile = path.resolve(outputDir, filename);
+      const dataFile = path.resolve(dataDir, filename);
       
       await fs.appendFile(dataFile, lines, 'utf8');
       logger.debug(`数据已保存到: ${dataFile} (${data.length}条)`);

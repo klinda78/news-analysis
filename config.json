@@ -1,0 +1,8 @@
+{
+  "raw_data_files_dir": "./data/memory",
+  "crawler_output_dir": "./data/output",
+  "candidat_events_file": "./data/memory.jsonl",
+  "logDir": "./logs",
+  "profileDir": "./profiles",
+  "dataDir": "./data"
+}

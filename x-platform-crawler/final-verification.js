@@ -5,12 +5,11 @@
  */
 const { chromium } = require('playwright');
 const CONFIG = require('./config');
-
 async function finalVerification() {
   console.log('=== 最终登录状态验证 ===\n');
   
   const chromePath = chromium.executablePath();
-  const chromeDataDir = CONFIG.dataDir;
+  const chromeDataDir = CONFIG.profileDir;
   
   console.log('使用正确的profile路径启动...\n');
   

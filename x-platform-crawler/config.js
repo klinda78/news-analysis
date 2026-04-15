@@ -5,7 +5,7 @@ const CONFIG = {
   // === 浏览器配置 ===
   
   // 会话配置
-  profileDir: "./profile",
+  profileDir: process.env.PROFILE_DIR || "./profile",
   headless: true, // 首次运行时设为false，手动登录后可以改为true
   
   // Chrome便携版路径（如果使用Playwright自带Chromium，设为null）
@@ -62,12 +62,13 @@ const CONFIG = {
   
   // === 日志配置 ===
   
-  logLevel: "info",
-  logFile: "./logs/crawler.log",
+  logLevel: process.env.LOG_LEVEL || "info",
+  logDir: process.env.LOG_DIR || "./logs",
+  logFile: "crawler.log",
   
   // === 数据存储 ===
-  dataDir: "./data",
-  dataFile: "./data/x_data.jsonl",
+  dataDir: process.env.CRAWLER_OUTPUT_DIR || "./data",
+  dataFile: "x_data.jsonl",
   
   // === 监控配置 ===
   

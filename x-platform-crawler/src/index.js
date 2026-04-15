@@ -4,6 +4,7 @@ const SessionManager = require('./session-manager');
 const logger = require('./logger');
 const fs = require('fs').promises;
 const path = require('path');
+const CONFIG = require('../config');
 
 /**
  * X平台数据抓取主程序
@@ -20,12 +21,12 @@ class XPlatformCrawler {
   async start() {
     try {
       logger.info('=== X平台数据抓取程序启动 ===');
-      logger.info(`版本: ${require('../package.json').version}`);
+      logger.info(`版本: ${CONFIG.version}`);
       logger.info(`配置: ${JSON.stringify({
-        headless: require('../config').headless,
-        interval: `${require('../config').crawlInterval / 60000}分钟`,
-        maxItems: require('../config').maxItemsPerCrawl,
-        maxChars: require('../config').maxCharsPerCrawl
+        headless: CONFIG.headless,
+        interval: `${CONFIG.crawlInterval / 60000}分钟`,
+        maxItems: CONFIG.maxItemsPerCrawl,
+        maxChars: CONFIG.maxCharsPerCrawl
       }, null, 2)}`);
       
       // 确保数据目录存在
@@ -55,7 +56,7 @@ class XPlatformCrawler {
    * 确保数据目录存在
    */
   async ensureDataDir() {
-    const dirs = ['./data', './logs', './profile'];
+    let dirs = [CONFIG.dataDir, CONFIG.logDir, CONFIG.profileDir]
     
     for (const dir of dirs) {
       try {
