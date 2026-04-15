@@ -1,26 +1,38 @@
+# Dependencies
 node_modules/
 .pnpm-store/
 
-*profile*/
-
+# Build outputs
 dist/
 build/
 *.exe
 
+# Environment variables
 .env
 .env.local
 .env.*.local
 
+# Logs
 logs/
 *.log
 npm-debug.log*
 
-
+# IDE
 .vscode/
 .idea/
 *.swp
 
+# OS files
 .DS_Store
 Thumbs.db
 
+# Project specific
 x_cookies.json
+*_cookies.json
+*_profile.json
+
+
+# 如果确实有叫 profile 的目录要忽略，写具体点
+profile/
+*_profile/
+*.profile/

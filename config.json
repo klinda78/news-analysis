@@ -3,6 +3,6 @@
   "crawler_output_dir": "./data/output",
   "candidat_events_file": "./data/memory.jsonl",
   "logDir": "./logs",
-  "profileDir": "./profiles",
+  "profileDir": "./profile",
   "dataDir": "./data"
 }
