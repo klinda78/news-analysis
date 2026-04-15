@@ -5,7 +5,7 @@ This project is a decoupled news analysis system consisting of a Node.js data in
 ## Project Structure
 
 - `src/`: Core logic
-  - `data_resources.json`: Data source configuration file, the default actived source is x-crawler.
+  - `data_resources.json`: Data source configuration file, the default actived source is x-crawler. u should custom this file to add more sources.
   - `Fetcher.js`: Low-level data fetching logic (HTTPS/Scraping).
   - `data_ingestion.js`: Logic to fetch data from different sources(default is x-crawler), inject env vars to submodule x-platform-crawler, parse and save raw data as JSONL.
   - `schedule.js`: Main entry point for the Node.js fetcher (runs on a loop).

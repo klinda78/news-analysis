@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { profileDir } = require('../x-platform-crawler/config');
+const { toAbsPath }  = require('./utils/path.util');
 
 // 常驻爬虫管理
 const crawlerProcesses = new Map();
@@ -62,8 +62,8 @@ async function shutdown() {
 };
 
 async function ingestFromCrawlerPersistent(source) {
-  const config = require('./config.json');
-  const toAbsPath = require('./utils/path.util');
+  const config = require('../config.json');
+ 
   const outputDir = toAbsPath(config.output_files_path ?? './memory');
   
   // 首次启动
@@ -90,20 +90,20 @@ async function startCrawlerProcess(source, outputDir) {
     return `https://x.com/search?q=${t}`;
   });
   const crawlerTargetsConfig = { targets: targetsUrls.concat(topicsUrls) };
-  const configPath = path.resolve(__dirname, `crawler-config-${source.id}.json`);
-  fs.writeFileSync(configPath, JSON.stringify(crawlerTargetsConfig, null, 2));
+  const crawlerTargetsConfigFile = path.resolve(__dirname, `crawler-config-${source.id}.json`);
+  fs.writeFileSync(crawlerTargetsConfigFile, JSON.stringify(crawlerTargetsConfig, null, 2));
 
-  // 把环境变量从主程序传递给子模块
+  // 把环境变量从主程序传递给子模块 , 必须传递绝对路径
   const config = require('../config.json');
   const proc = spawn('node', [modulePath], {
     env: {
       ...process.env,
       PARENT_PID: process.pid,
-      LOG_DIR: config.logDir,
-      PROFILE_DIR: config.profileDir,
-      CRAWLER_OUTPUT_DIR: config.crawler_output_dir,
+      LOG_DIR: toAbsPath(config.logDir),
+      PROFILE_DIR: toAbsPath(config.profileDir),
+      CRAWLER_OUTPUT_DIR: toAbsPath(config.crawler_output_dir),
       CRAWL_INTERVAL_MS: String(source.interval || 30 * 60 * 1000),
-      CRAWLER_CONFIG_FILE: configPath
+      CRAWLER_CONFIG_FILE: crawlerTargetsConfigFile
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -159,8 +159,8 @@ async function startCrawlerProcess(source, outputDir) {
       exitError = new Error(`子进程意外退出，退出码: ${code}`);
     }
     // 清理临时配置文件
-    if (fs.existsSync(configPath)) {
-      try { fs.unlinkSync(configPath); } catch {}
+    if (fs.existsSync(crawlerTargetsConfigFile)) {
+      try { fs.unlinkSync(crawlerTargetsConfigFile); } catch (err) { console.error(`[${source.id}] 清理临时配置文件失败`, err); }
     }
     crawlerProcesses.delete(source.id);
   });

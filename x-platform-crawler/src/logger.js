@@ -1,7 +1,7 @@
 const winston = require('winston');
 const chalk = require('chalk');
 const CONFIG = require('../config');
-
+const path = require('path');
 // 自定义日志格式
 const customFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
   let color;
@@ -19,6 +19,7 @@ const customFormat = winston.format.printf(({ level, message, timestamp, ...meta
 
 
 // 创建logger实例
+
 const logger = winston.createLogger({
   level: CONFIG.logLevel,
   format: winston.format.combine(
@@ -31,7 +32,7 @@ const logger = winston.createLogger({
     new winston.transports.Console(),
     // 文件输出
     new winston.transports.File({ 
-      filename: path.resolve(__dirname, '../' + CONFIG.logDir, CONFIG.logFile),
+      filename: path.resolve(CONFIG.logDir, CONFIG.logFile),
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
