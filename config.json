@@ -1,5 +1,8 @@
 {
   "raw_data_files_dir": "./data/memory",
+  "processing_data_dir": "./data/processing",
+  "archive_data_dir": "./data/archive",
+  "output_data_dir": "./data/output",
   "crawler_output_dir": "./data/output",
   "candidat_events_file": "./data/memory.jsonl",
   "logDir": "./logs",

@@ -12,7 +12,7 @@ def load_config():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     # 定位到父节点 src 文件夹
     src_dir = os.path.dirname(current_dir)
-    config_path = os.path.join(src_dir, "config.json")
+    config_path = os.path.normpath(os.path.join(src_dir, "..", "config.json"))
     
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
@@ -23,11 +23,11 @@ def main():
     config, src_dir = load_config()
     
     # 彻底弃用绝对路径，改为相对 src 的动态路径拼接
-    raw_data_rel_path = config.get("raw_data_files_path", "./memory")
-    output_rel_path = config.get("output_files_path", "./output")
+    raw_data_rel_path = config.get("raw_data_files_dir", "./memory")
+    output_rel_path = config.get("output_data_dir", "./output")
     
-    base_dir = os.path.normpath(os.path.join(src_dir, raw_data_rel_path))
-    output_dir = os.path.normpath(os.path.join(src_dir, output_rel_path))
+    base_dir = os.path.normpath(os.path.join(src_dir,'..', raw_data_rel_path))
+    output_dir = os.path.normpath(os.path.join(src_dir,'..', output_rel_path))
     
     # 确保输出目录存在
     os.makedirs(output_dir, exist_ok=True)
