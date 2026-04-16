@@ -43,17 +43,30 @@ const CONFIG = {
   scrollDistance: 2000, // 滚动距离
   
   // === 目标URLs ===
-  
+  xcrawler_config: process.env.CRAWLER_CONFIG_FILE || null,
+
   targets: (() => {
-    if (process.env.CRAWLER_CONFIG_FILE) {
+    // 注意：此处是对象字面量内的 IIFE，this 不是 CONFIG 对象
+    // 必须直接读 process.env，不能用 this.xxx
+    const configFile = process.env.CRAWLER_CONFIG_FILE;
+    // console.error('[config.js] CRAWLER_CONFIG_FILE =', configFile);  // 调试：确认env是否到达
+    if (configFile) {
       try {
         const fs = require('fs');
-        const externalConfig = JSON.parse(fs.readFileSync(process.env.CRAWLER_CONFIG_FILE, 'utf8'));
-        if (externalConfig.targets) return externalConfig.targets;
+        if (!fs.existsSync(configFile)) {
+          console.debug('[x config.js] Config file NOT FOUND:', configFile);
+        } else {
+          const externalConfig = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+          if (externalConfig.targets && externalConfig.targets.length > 0) {
+            console.debug('[x config.js] Loaded', externalConfig.targets.length, 'targets from config file');
+            return externalConfig.targets;
+          }
+        }
       } catch (e) {
-        console.error('Failed to load external crawler config:', e.message);
+        console.error('[x config.js] Failed to load external crawler config:', e.message);
       }
     }
+    console.debug('[x config.js] Using default targets (env var missing or file load failed)');
     return [
       "https://x.com/Danny_Crypton",
       "https://x.com/search?q=Powell"

@@ -26,7 +26,9 @@ class XPlatformCrawler {
         headless: CONFIG.headless,
         interval: `${CONFIG.crawlInterval / 60000}分钟`,
         maxItems: CONFIG.maxItemsPerCrawl,
-        maxChars: CONFIG.maxCharsPerCrawl
+        maxChars: CONFIG.maxCharsPerCrawl,
+        current_xcrawler_config: CONFIG.xcrawler_config,
+        targets: CONFIG.targets.length
       }, null, 2)}`);
       
       // 确保数据目录存在

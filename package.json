@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@steipete/sweet-cookie": "0.2.0",
-    "@klinda78/x-crawler": "file:./x-platform-crawler"
+    "@klinda78/x-crawler": "workspace:*"
 
   }
 }
