@@ -1,6 +1,7 @@
-# trend_utils.py (你的算法逻辑，和event_engine解耦,包含一个跟踪cluster event事件状态的函数)
+# utils.py (你的算法逻辑，和event_engine解耦,包含一个跟踪cluster event事件状态的函数)
 import time
 import sqlite3
+import os
 
 def calculate_momentum(event):
     """
@@ -29,3 +30,16 @@ def query_event(db_path,event_id):
         """, (event_id,))
         return conn.fetchone()
 
+def path_abs(relative_path):
+    """
+    获取绝对路径
+    """
+    # 获取当前文件的绝对路径
+    current_file_path = os.path.abspath(__file__)
+    # 获取当前文件的目录
+    current_dir = os.path.dirname(current_file_path)
+    src_dir = os.path.dirname(current_dir)
+    root_dir = os.path.dirname(src_dir)
+    # 拼接路径
+    absolute_path = os.path.normpath(os.path.join(root_dir, relative_path))
+    return absolute_path

@@ -1,7 +1,7 @@
 import sqlite3
 import time
 from models import ClusterEventObject
-from trend_utils import calculate_momentum, calculate_velocity, query_event
+from utils import calculate_momentum, calculate_velocity, query_event
 
 class EventEngine:
     def __init__(self, db_path="events_manager.db"):

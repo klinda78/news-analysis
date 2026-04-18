@@ -11,10 +11,10 @@ from filter_candidate_event import is_cluster_event, enrich_event_obj
 from llm_summarize import llm_summarize
 from standardized_tool import StandardizedEvent
 from event_engine import EventEngine
-from utils import toAbsPath
+from utils import path_abs
 
 def load_config():
-    config_dir = toAbsPath("./src")
+    config_dir = path_abs("./")
     config_file_path = os.path.normpath(os.path.join(config_dir, "./config.json"))
     
     if os.path.exists(config_file_path):
@@ -146,13 +146,14 @@ def main():
     config, src_dir = load_config()
 
     # 从 config.json 解析三段式目录
-    memory_dir     = toAbsPath(config.get("rawdata_files_dir"), "./data/memory")
-    processing_dir = toAbsPath( config.get("processing_data_dir"), "./data/processing")
-    archive_dir    = toAbsPath( config.get("archive_data_dir"),  "./data/archive")
-    output_dir     = toAbsPath(config.get("output_data_dir"), "./data/output")
+    memory_dir     = path_abs(config.get("raw_data_files_dir"))
+    processing_dir = path_abs(config.get("processing_data_dir"))
+    archive_dir    = path_abs(config.get("archive_data_dir"))
+    output_dir     = path_abs(config.get("output_data_dir"))
 
     # 持久化去重数据库路径
-    dedup_db_path  = toAbsPath(config.get("dataDir"), "./data/dedup.db")
+    dedup_db_dir  = path_abs(config.get("dataDir") or "./data")
+    dedup_db_path = os.path.join(dedup_db_dir, "dedup.db")
 
     os.makedirs(memory_dir, exist_ok=True)
 
