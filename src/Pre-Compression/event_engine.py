@@ -1,9 +1,6 @@
-from pyexpat import model
 import sqlite3
-import hashlib
 import time
-from datetime import datetime
-from models import EventObject,ClusterEventObject
+from models import ClusterEventObject
 from trend_utils import calculate_momentum, calculate_velocity, query_event
 
 class EventEngine:
@@ -26,8 +23,19 @@ class EventEngine:
                     extra_data TEXT  -- 预留位：存储不确定结构的 JSON
                 )
             """)
+    
 
-    def get_active_events(self):
+    async def track_trends(self):  # 这是一个示例函数，你可以根据自己的需求进行修改
+    
+        # 获取当前所有处于活跃状态的候选事件 (candidate_events)
+        active_cluster_events = self._get_active_events()
+        
+        for event in active_cluster_events:
+            print(f"追踪更新: Cluster Event {event['cluster_id']}" + "\n" + event['status'] + "\n" + event['velocity'] + "\n" +event['level'])  
+
+        return active_cluster_events
+
+    def _get_active_events(self):
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
                 SELECT * FROM candidate_events WHERE status = 'active'

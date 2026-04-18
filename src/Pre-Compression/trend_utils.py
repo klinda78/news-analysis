@@ -30,22 +30,3 @@ def query_event(db_path,event_id):
         """, (event_id,))
         return conn.fetchone()
 
-
-async def track_trends():  # 这是一个示例函数，你可以根据自己的需求进行修改
-    # EventEngine
-    engine = EventEngine()
-    
-    # 获取当前所有处于活跃状态的候选事件 (candidate_events)
-    active_cluster_events = engine.get_active_events()
-    
-    for cluster_event in active_cluster_events:
-  
-        # 到数据库查询 event 的最新情况
-        sql_query = f' SELECT * FROM candidate_events WHERE cluster_id = ?'
-        with sqlite3.connect(engine.db_path) as conn:
-            conn.execute(sql_query, (cluster_event['cluster_id'],))
-            event = conn.fetchone()
-        
-            print(f"追踪更新: Event {cluster_event['cluster_id']}" + "\n" + event['status'] + "\n" + event['velocity'] + "\n" +event['level'])  
-
-    return active_cluster_events

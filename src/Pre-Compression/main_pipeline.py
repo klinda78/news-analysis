@@ -10,7 +10,7 @@ from clustering import cluster_texts
 from filter_candidate_event import is_cluster_event, enrich_event_obj
 from llm_summarize import llm_summarize
 from Standardized_tool import StandardizedEvent
-from trend_utils import track_trends
+from event_engine import EventEngine
 
 def load_config():
     # 动态获取当前文件所属路径 (src/Pre-Compression)
@@ -126,7 +126,7 @@ def run_pipeline(input_files, output_dir, dedup_db_path):
     print(f"[Stage 4] candidate events written {len(candidate_events)} cluster events to db table: candidate_events")
     
     # 第五步 追踪后续事件的更新
-    active_cluster_events = track_trends(candidate_events)
+    active_cluster_events = EventEngine.track_trends(candidate_events)
     print(f"[Stage 5] cative candidate events tracked")
 
     # 第六步：LLM 有效性筛查（只过滤，不生成），将event对象转交给下一个业务对象

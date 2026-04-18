@@ -19,7 +19,7 @@ async function dataIngestion(source) {
   // ... 原有落盘逻辑
   if (!rawData) return 0;
   const config = require('../config.json');
-  const outputDir = path.resolve(__dirname, config.output_data_dir || 'memory');
+  const outputDir = toAbsPath(config.raw_data_files_dir || 'memory');
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }

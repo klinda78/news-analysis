@@ -15,13 +15,14 @@ const toAbsPath = (configPath) => {
   return path.resolve(PROJECT_ROOT, cleanPath);
 };
 
-const get_source_name = (file_path) => {
-    const filename = path.basename(file_path);
-    const parts = filename.split('_');
+const get_source_name = (filename) => {
+    const str_filename = path.basename(filename);
+    const parts = str_filename.split('_');
     return parts[1];
 }
 
 module.exports = {
   PROJECT_ROOT,
-  toAbsPath
+  toAbsPath,
+  get_source_name
 };

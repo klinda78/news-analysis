@@ -1,6 +1,5 @@
-from pandas._typing import Level
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 
 @dataclass
 class EventObject:

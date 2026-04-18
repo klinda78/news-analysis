@@ -25,6 +25,10 @@ class StandardizedEvent:
         match self.source_id:
             case 'x' | 'twitter':
                 item = self._from_x(raw_item)
+            case 'google':
+                item = self._from_google(raw_item)
+            case 'polymarket':
+                item = self._from_polymarket(raw_item)
             case 'reddit':
                 item = self._from_reddit(raw_item)
             case _:
@@ -73,7 +77,50 @@ class StandardizedEvent:
 
         return True
 
+    def _from_google(self, item):
+        # 针对 Google 的逻辑：使用 link 作为唯一 ID 的基准
+        link = item.get('link', '')
+        event_id = hashlib.md5(link.encode()).hexdigest()
 
+        ref_ts = self._get_ref_ts(item)
+        return EventObject(
+            event_id=event_id,
+            source_meta={
+                "platform": "google",
+                "raw_ref": self.raw_ref,
+                "original_id": link.split('/')[-1] if '/' in link else "",
+                "ref_ts": ref_ts
+            },
+            content_payload={
+                "text": item.get('text', ''),
+                "clean_text": "" # 留给后续 NLP 模块填充
+            },
+            # 初始指标全部留空或设为默认值
+            math_metrics={"velocity": 0.0, "momentum": 0.0, "occurrence_count": 1},
+            status_track={"level": 1, "is_new": True, "tags": []}
+        )
+    def _from_polymarket(self, item):
+        # 针对 Polymarket 的逻辑：使用 link 作为唯一 ID 的基准
+        link = item.get('link', '')
+        event_id = hashlib.md5(link.encode()).hexdigest()
+
+        ref_ts = self._get_ref_ts(item)
+        return EventObject(
+            event_id=event_id,
+            source_meta={
+                "platform": "polymarket",
+                "raw_ref": self.raw_ref,
+                "original_id": link.split('/')[-1] if '/' in link else "",
+                "ref_ts": ref_ts
+            },
+            content_payload={
+                "text": item.get('text', ''),
+                "clean_text": "" # 留给后续 NLP 模块填充
+            },
+            # 初始指标全部留空或设为默认值
+            math_metrics={"velocity": 0.0, "momentum": 0.0, "occurrence_count": 1},
+            status_track={"level": 1, "is_new": True, "tags": []}
+        )
     def _from_x(self, item):
         # 针对 X 的逻辑：使用 link 作为唯一 ID 的基准
         link = item.get('link', '')
