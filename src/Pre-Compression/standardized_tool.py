@@ -64,7 +64,7 @@ class StandardizedEvent:
         return ref_ts
 
     def _filter_time_inrange(self,item):
-        ref_ts = item.get('ref_ts') 
+        ref_ts = item['source_meta']['ref_ts'] 
         current_ts = int(time.time())
         
         # 7天有效性检查

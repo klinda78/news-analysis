@@ -1,7 +1,6 @@
 # trend_utils.py (你的算法逻辑，和event_engine解耦,包含一个跟踪cluster event事件状态的函数)
 import time
 import sqlite3
-from event_engine import EventEngine
 
 def calculate_momentum(event):
     """

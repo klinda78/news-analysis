@@ -9,25 +9,18 @@ from pre_filter import filter_raw_data
 from clustering import cluster_texts
 from filter_candidate_event import is_cluster_event, enrich_event_obj
 from llm_summarize import llm_summarize
-from Standardized_tool import StandardizedEvent
+from standardized_tool import StandardizedEvent
 from event_engine import EventEngine
+from utils import toAbsPath
 
 def load_config():
-    # 动态获取当前文件所属路径 (src/Pre-Compression)
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    # 定位到父节点 src 文件夹
-    src_dir = os.path.dirname(current_dir)
-    config_path = os.path.normpath(os.path.join(src_dir, "..", "config.json"))
+    config_dir = toAbsPath("./src")
+    config_file_path = os.path.normpath(os.path.join(config_dir, "./config.json"))
     
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            return json.load(f), src_dir
-    return {}, src_dir
-
-def resolve_dir(src_dir, rel_path, default):
-    """将 config.json 中的相对路径解析为项目根目录的绝对路径。"""
-    path = rel_path or default
-    return os.path.normpath(os.path.join(src_dir, "..", path))
+    if os.path.exists(config_file_path):
+        with open(config_file_path, "r", encoding="utf-8") as f:
+            return json.load(f), config_dir
+    return {}, config_dir
 
 def stage_files(memory_dir, processing_dir):
     """
@@ -153,12 +146,13 @@ def main():
     config, src_dir = load_config()
 
     # 从 config.json 解析三段式目录
-    memory_dir     = resolve_dir(src_dir, config.get("rawdata_files_dir"),    "./data/memory")
-    processing_dir = resolve_dir(src_dir, config.get("processing_data_dir"),   "./data/processing")
-    archive_dir    = resolve_dir(src_dir, config.get("archive_data_dir"),      "./data/archive")
-    output_dir     = resolve_dir(src_dir, config.get("output_data_dir"),       "./data/output")
+    memory_dir     = toAbsPath(config.get("rawdata_files_dir"), "./data/memory")
+    processing_dir = toAbsPath( config.get("processing_data_dir"), "./data/processing")
+    archive_dir    = toAbsPath( config.get("archive_data_dir"),  "./data/archive")
+    output_dir     = toAbsPath(config.get("output_data_dir"), "./data/output")
+
     # 持久化去重数据库路径
-    dedup_db_path  = resolve_dir(src_dir, os.path.join(config.get("dataDir", "./data"), "dedup.db"), "./data/dedup.db")
+    dedup_db_path  = toAbsPath(config.get("dataDir"), "./data/dedup.db")
 
     os.makedirs(memory_dir, exist_ok=True)
 
