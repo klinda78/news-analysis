@@ -1,5 +1,6 @@
 {
   "raw_data_files_dir": "./data/memory",
+  "example_files_name": "raw_x_data.jsonl",
   "processing_data_dir": "./data/processing",
   "archive_data_dir": "./data/archive",
   "output_data_dir": "./data/output",

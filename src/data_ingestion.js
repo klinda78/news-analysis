@@ -17,6 +17,44 @@ async function dataIngestion(source) {
   const parser = require('./parser');
   const rawData = await fetchData(source);
   // ... 原有落盘逻辑
+  if (!rawData) return 0;
+  const config = require('../config.json');
+  const outputDir = path.resolve(__dirname, config.output_data_dir || 'memory');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  const outputFileName = `rawdata_${source.platform.name}_${new Date().toISOString().split('T')[0]}.jsonl`;
+  const outputPath = path.join(outputDir, outputFileName);
+
+  // // 写入原始数据
+  // const record = {
+  //   _id: source.id,
+  //   _source: source.id,
+  //   _timestamp: new Date().toISOString(),
+  //   _data: rawData,
+  // };
+
+  // fs.appendFileSync(outputPath, JSON.stringify(record) + '\n');
+  // console.log(`[${source.id}] 原始数据已追加到 ${outputPath}`);
+
+  // 解析并写入结构化数据
+  const items = parser(rawData, source);
+  if (Array.isArray(items) && items.length > 0) {
+    for (const item of items) {
+      const itemRecord = {
+        _id: item.id || `${source.id}_${Date.now()}`,
+        _source: source.platform.name,
+        _crawled_at: new Date().toISOString(),
+        ...item,
+      };
+      fs.appendFileSync(outputPath, JSON.stringify(itemRecord) + '\n');
+    }
+    console.log(`[${source.id}] 已解析 ${items.length} 条结构化数据到 ${outputPath}`);
+    return items.length;
+  }
+
+  return 0;
 };
 
 // 关闭所有常驻进程
@@ -64,7 +102,7 @@ async function shutdown() {
 async function ingestFromCrawlerPersistent(source) {
   const config = require('../config.json');
  
-  const outputDir = toAbsPath(config.output_files_path ?? './memory');
+  const outputDir = toAbsPath(config.output_data_dir ?? './memory');
   
   // 首次启动
   if (!crawlerProcesses.has(source.id)) {
@@ -191,7 +229,7 @@ async function startCrawlerProcess(source, outputDir) {
 }
 
 async function processCrawlerOutput(info, sourceId, outputDir) {
-  const unifiedFile = path.join(outputDir, `raw_data_04012026.jsonl`);
+  const unifiedFile = path.join(outputDir, `rawdata_04012026.jsonl`);
   let count = 0;
   
   // 处理待处理文件

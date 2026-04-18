@@ -3,7 +3,7 @@
     "id": "fed_policy",
     "active": false,
     "entity_type": "webpage",
-    "source_type": "knowledge",
+    "source_type": "policy",
     "trigger_mode" : "pull",
     "signal_type": ["policy"],
   
@@ -34,11 +34,11 @@
     "active": false,
     "entity_type": "webpage",
     "trigger_mode" : "pull",
-    "identifier": {
-      "value": "https://techcrunch.com",
-      "platform": "website"
+    "platform": {
+      "name": "techcrunch",
+      "has_api": false
     },
-    "source_type": "tech_trend",
+    "source_type": "news",
     "signal_type": ["narrative", "technology"],
     "access": {
       "mode": "scraper",
@@ -63,7 +63,7 @@
   ,
   {
     "id": "google_news_ai_policy",
-    "active": false,
+    "active": true,
     "entity_type": "webpage",
     "trigger_mode": "pull",
     "source_type": "knowledge",
@@ -91,7 +91,7 @@
   },
     {
     "id": "x_bigshots_latest",
-    "active": true,
+    "active": false,
     "entity_type": "account",
     "trigger_mode": "pull",
      "targets": [
@@ -118,7 +118,7 @@
         "forex",
         "crypto"
     ],
-    "source_type": "idea",
+    "source_type": "narrative",
     "signal_type": ["narrative", "social_trend"],
     "platform": {
       "name": "x",
@@ -148,14 +148,14 @@
   },
   {
     "id": "polymarket_ai_policy_forecast",
-    "active": false,
+    "active": true,
     "entity_type": "webpage",
     "trigger_mode": "pull",
     "source_type": "expectation",
     "signal_type": ["capital_flow", "macro"],
     "platform": {
       "name": "polymarket",
-      "has_api": false
+      "has_api": true
     },
     "access": {
       "mode": "browser",
