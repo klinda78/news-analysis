@@ -18,7 +18,7 @@ module.exports = async function dataIngestion(source) {
   // 为了跟 Python 端模拟的静态测试衔接过渡，现阶段默认指向 `rawdata_04012026.jsonl`
   // 未来可改为根据当日动态时间戳组装文件名
   const outputFileName = `rawdata_04012026.jsonl`;
-  const outputDir = path.resolve(__dirname, config.raw_data_files_path || 'memory');
+  const outputDir = path.resolve(__dirname, config.rawdata_files_path || 'memory');
   
   if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });

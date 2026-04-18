@@ -81,7 +81,7 @@ const CONFIG = {
   
   // === 数据存储 ===
   dataDir: process.env.CRAWLER_OUTPUT_DIR || "./data",
-  dataFile: "x_data.jsonl",
+  dataFile: "raw_x_data.jsonl",
   
   // === 监控配置 ===
   

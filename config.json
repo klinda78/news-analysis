@@ -3,7 +3,7 @@
   "processing_data_dir": "./data/processing",
   "archive_data_dir": "./data/archive",
   "output_data_dir": "./data/output",
-  "crawler_output_dir": "./data/output",
+  "crawler_output_dir": "./data/memory",
   "candidat_events_file": "./data/memory.jsonl",
   "logDir": "./logs",
   "profileDir": "./profile",

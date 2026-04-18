@@ -191,7 +191,7 @@ async function startCrawlerProcess(source, outputDir) {
 }
 
 async function processCrawlerOutput(info, sourceId, outputDir) {
-  const unifiedFile = path.join(outputDir, `rawdata_04012026.jsonl`);
+  const unifiedFile = path.join(outputDir, `raw_data_04012026.jsonl`);
   let count = 0;
   
   // 处理待处理文件
