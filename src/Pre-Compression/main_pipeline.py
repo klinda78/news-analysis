@@ -12,6 +12,7 @@ from llm_summarize import llm_summarize
 from standardized_tool import StandardizedEvent
 from event_engine import EventEngine
 from utils import path_abs
+from dataclasses import asdict
 
 def load_config():
     config_dir = path_abs("./")
@@ -146,8 +147,10 @@ def run_pipeline(input_files, output_dir, dedup_db_path):
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = os.path.join(output_dir, f"events_{run_ts}.jsonl")
     with open(output_file, "w", encoding="utf-8") as f:
-        for event in final_events:
-            f.write(json.dumps(event.to_dict(), ensure_ascii=False) + "\n")
+        for cluster in final_events:
+            cluster_dict = asdict(cluster)
+            del cluster_dict["items"]  # 删除 items 字段
+            f.write(json.dumps(cluster_dict, ensure_ascii=False) + "\n")
 
     print(f"--- [Success] Wrote {len(final_events)} event_obj(s) to: {output_file} ---")
 
