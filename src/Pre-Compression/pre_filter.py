@@ -46,6 +46,7 @@ def is_valid(text):
     has_entity = False
     for kw in ENTITY_KEYWORDS:
         if kw in text_lower:
+            print(f"[Keyword Found] {kw} in {text}")
             has_entity = True
             break
             
@@ -69,9 +70,9 @@ def filter_raw_data(raw_data_list, db_path=None):
     if db_path:
         deduplicator = SQLiteDeduplicator(db_path)
     
-    for item in raw_data_list: # raw_data_list is a list of standardized_data
-        text = item.get("text", "")
-        h = item.get("hash", "")        
+    for item in raw_data_list: # raw_data_list is a list of EventObject
+        text = item.content_payload.get("text", "")
+        h = item.event_id
         # 1. 批次内去重
         if h in seen_in_batch:
             continue

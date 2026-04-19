@@ -3,93 +3,104 @@ import os
 import time
 import uuid
 import random
+from datetime import datetime
 
-def generate_mock_data():
-    base_dir = r"d:\onedriver\OneDrive\myproject\news-analysis\src\memory"
-    os.makedirs(base_dir, exist_ok=True)
-    filepath = os.path.join(base_dir, "rawdata_04012026.jsonl")
+# Topics to pass filter
+TOPICS = [
+    "TSMC says its Arizona fab is meeting production targets for 2nm chips.",
+    "Federal Reserve expected to cut rates by 25bps in June FOMC meeting.",
+    "Apple unveils new M5 Ultra chip with advanced AI processing capabilities.",
+    "Oil prices jump as tensions escalate in the Middle East region.",
+    "China economic data shows stronger-than-expected growth in Q1 2026.",
+    "Gold prices hit record high of $2500 as investors seek safety.",
+    "Sam Altman discusses regulatory challenges for AI superintelligence.",
+    "Nvidia market cap surpasses Microsoft to become the world's largest company.",
+    "US Election 2026: Polls show tight race in swing states.",
+    "FOMC minutes suggest maintain interest rates at current levels."
+]
+
+def generate_x_records(count, current_time):
+    records = []
+    for i in range(count):
+        text = random.choice(TOPICS) + " #" + str(uuid.uuid4())[:4]
+        ts = current_time - random.randint(0, 3600 * 24 * 2)
+        record = {
+            "text": text,
+            "time": datetime.fromtimestamp(ts).isoformat() + ".000Z",
+            "link": f"https://x.com/user/status/{random.randint(10**18, 2*10**18)}",
+            "source_url": "https://x.com/news_bot",
+            "crawled_at": datetime.fromtimestamp(current_time).isoformat() + ".000Z",
+            "platform": "x"
+        }
+        records.append(record)
+    return records
+
+def generate_google_records(count, current_time):
+    records = []
+    for i in range(count):
+        text = random.choice(TOPICS) + " " + str(uuid.uuid4())[:8]
+        ts = current_time - random.randint(0, 3600 * 24 * 2)
+        item_id = str(uuid.uuid4())
+        record = {
+            "_id": item_id,
+            "_source": "google",
+            "_crawled_at": datetime.fromtimestamp(current_time).isoformat() + "Z",
+            "id": item_id,
+            "text": text,
+            "timestamp": ts,
+            "source": "google_news_finance"
+            # Note: link is missing in archive examples for Google, 
+            # though standardized_tool.py looks for it. 
+            # Adding it here to be safe but keeping the structure minimal.
+            # "link": f"https://news.google.com/articles/{uuid.uuid4()}"
+        }
+        records.append(record)
+    return records
+
+def generate_polymarket_records(count, current_time):
+    records = []
+    for i in range(count):
+        text = f"Polymarket: Will {random.choice(['Fed', 'Apple', 'Tesla', 'TSMC'])} succeed? (Yes: {random.randint(1, 99)}%)"
+        ts = current_time - random.randint(0, 3600 * 24 * 2)
+        item_id = str(uuid.uuid4())
+        record = {
+            "_id": item_id,
+            "_source": "polymarket",
+            "_crawled_at": datetime.fromtimestamp(current_time).isoformat() + "Z",
+            "id": item_id,
+            "text": text,
+            "timestamp": ts,
+            "source": "polymarket_forecast"
+        }
+        records.append(record)
+    return records
+
+def main():
+    root_dir = r"d:\onedriver\OneDrive\myproject\news-analysis"
+    memory_dir = os.path.join(root_dir, "data", "memory")
+    os.makedirs(memory_dir, exist_ok=True)
     
     current_time = int(time.time())
+    date_str = datetime.now().strftime("%Y-%m-%d")
     
-    events = [
-        # Event 1: TSMC Factory (Valid, >= 3 messages)
-        "TSMC announces new 2nm fab in Arizona, expanding US footprint.",
-        "Taiwan Semiconductor Manufacturing Co to build a new factory in Arizona for 2nm chips.",
-        "Breaking: TSMC confirms $20B investment for a new US facility.",
-        "TSMC Arizona plant to start 2nm production by 2028, sources say.",
-        "US subsidies help TSMC build another cutting-edge semiconductor plant in Arizona.",
-        "TSMC expanding production! 2nm plant in USA confirmed.",
-        
-        # Event 2: Fed Rate Cut (Valid, > 3 messages)
-        "Federal Reserve cuts interest rates by 25 basis points.",
-        "Fed slashes rates by 0.25%, markets react positively.",
-        "Jerome Powell announces a quarter-point rate cut at latest FOMC meeting.",
-        "Interest rates dropped by 0.25% by the Federal Reserve.",
-        "The Fed finally cuts rates, lowering borrowing costs.",
-        
-        # Event 3: Middle East Conflict (Valid, > 3 messages)
-        "Oil prices surge past $90 as Middle East tensions escalate.",
-        "Escalation in the Middle East sends Brent crude over $90 a barrel.",
-        "Geopolitical risks in the Mideast cause oil shock, prices jump to $92.",
-        "Crude oil hits new highs today due to ongoing Middle East conflict.",
-        
-        # Short Noise (<20 chars)
-        "Hello!",
-        "This is bad.",
-        "Wow, just wow.",
-        "Sell everything now.",
-        "Market is open.",
-        "Good morning.",
-        "What a day.",
-        
-        # No entity Noise (Random generic statements)
-        "The weather is very nice outside today, maybe I should go for a walk.",
-        "Someone just bought a massive amount of coffee at the local shop.",
-        "I can't believe how expensive apples are getting these days.",
-        "Looking forward to the weekend so I can finally rest.",
-        "My dog ate my homework again, what a disaster.",
+    # Task: 100 per source, separate files
+    jobs = [
+        ("x", generate_x_records),
+        ("google", generate_google_records),
+        ("polymarket", generate_polymarket_records)
     ]
     
-    # Exact Duplicates
-    exact_duplicates = [
-        "Gold reaches new all-time high of $2400 per ounce.",
-        "Gold reaches new all-time high of $2400 per ounce.",
-        "Gold reaches new all-time high of $2400 per ounce.",
-        "Gold reaches new all-time high of $2400 per ounce.",
-        "Gold reaches new all-time high of $2400 per ounce.",
-    ]
-    
-    sources_list = ["twitter", "bbc", "reuters", "bloomberg", "reddit"]
-    
-    data = []
-    
-    # Add structured events
-    for _ in range(100):
-        # Pick randomly to simulate a stream
-        r = random.random()
-        if r < 0.5:
-            text = random.choice(events)
-        elif r < 0.7:
-            text = random.choice(exact_duplicates)
-        elif r < 0.85:
-            text = "Too short."
-        else:
-            text = "It is raining heavily in my town today, no one is outside playing." # No entity
-            
-        record = {
-            "id": str(uuid.uuid4()),
-            "text": text,
-            "timestamp": current_time - random.randint(10, 3600),
-            "source": random.choice(sources_list),
-            "author": "user_" + str(random.randint(100, 999))
-        }
-        data.append(record)
+    for platform, generator in jobs:
+        filename = f"rawdata_{platform}_{date_str}.jsonl"
+        filepath = os.path.join(memory_dir, filename)
         
-    with open(filepath, 'w', encoding='utf-8') as f:
-        for d in data:
-            f.write(json.dumps(d) + "\n")
-            
-    print(f"Generated 100 mock records at {filepath}")
+        records = generator(100, current_time)
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            for r in records:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        
+        print(f"Generated 100 records for {platform} at {filepath}")
 
-if __name__ == '__main__':
-    generate_mock_data()
+if __name__ == "__main__":
+    main()

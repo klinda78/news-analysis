@@ -7,13 +7,17 @@ import time, os,time,datetime
 SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60
 class StandardizedEvent:
     def __init__(self, file_path):
-        # 1. 从路径中提取文件名，例如 "x_20260417.jsonl"
+        # 1. 从路径中提取文件名，例如 "rawdata_google_20260418.jsonl"
         self.raw_ref = os.path.basename(file_path)
         
-        # 2. 约定：文件名第一个下划线前的内容为 source_id
-        # 如果解析失败，默认设为 'generic'
+        # 2. 支持 rawdata_<platform>_... 和 raw_<platform>_... 两种命名模式
         try:
-            self.source_id = self.raw_ref.split('_')[0].lower()
+            parts = self.raw_ref.lower().split('_')
+            prefix = parts[0]  # 'rawdata' or 'raw'
+            if prefix in ('rawdata', 'raw') and len(parts) > 1:
+                self.source_id = parts[1]  # 取第二段作为来源标识
+            else:
+                self.source_id = prefix
         except Exception:
             self.source_id = 'generic'
 
@@ -56,23 +60,23 @@ class StandardizedEvent:
                     clean_time = raw_time.replace('Z', '+00:00')
                     # fromisoformat 只能处理某些特定位数的毫秒，
                     # 如果报错，说明格式太复杂，需要更强大的解析
-                    dt = datetime.fromisoformat(clean_time)
+                    dt = datetime.datetime.fromisoformat(clean_time)
                     ref_ts = int(dt.timestamp())
                 except Exception:
                     # 如果解析失败，可以在这里尝试更宽泛的解析，或者保持兜底
                     pass         
         return ref_ts
 
-    def _filter_time_inrange(self,item):
-        ref_ts = item['source_meta']['ref_ts'] 
+    def _filter_time_inrange(self, item):
+        ref_ts = item.source_meta.get('ref_ts', 0)
         current_ts = int(time.time())
-        
+
         # 7天有效性检查
         time_diff = current_ts - ref_ts
-        
+
         # 逻辑：如果是未来的时间（时间错位）或者超过 7 天
         if time_diff < 0 or time_diff > SEVEN_DAYS_SECONDS:
-            item.ref_ts = None
+            item.source_meta['ref_ts'] = None
             return False  # 或者标记为低优先级
 
         return True

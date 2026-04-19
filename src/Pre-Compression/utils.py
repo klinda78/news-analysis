@@ -23,12 +23,12 @@ def calculate_velocity(event):
     velocity = round(event['size'] / max(time_span, 60), 4)
     return velocity
 
-def query_event(db_path,event_id):
+def query_event(db_path,cluster_id):
     with sqlite3.connect(db_path) as conn:
-        conn.execute("""
-            SELECT * FROM candidate_events WHERE event_id = ?
-        """, (event_id,))
-        return conn.fetchone()
+        cursor = conn.execute("""
+            SELECT * FROM candidate_events WHERE cluster_id = ?
+        """, (cluster_id,))
+        return cursor.fetchone()
 
 def path_abs(relative_path):
     """

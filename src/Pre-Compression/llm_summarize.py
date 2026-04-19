@@ -4,7 +4,7 @@ def llm_summarize(event_obj):
     它负责看一眼 event_obj，给出一个 True (保留并传给 Expert agent) 或 False (丢弃)。
     不额外增加 subjective tags，仅限于抛光候选事件集。
     """
-    text = event_obj.get("centroid_text", "").lower()
+    text = event_obj.centroid_text.lower()
     
     # --- 这是一个本地的模拟返回，供日后被替换成真正的 Remote API ---
     # prompt = f"Is this news market moving? REPLY True or False.\n {text}"

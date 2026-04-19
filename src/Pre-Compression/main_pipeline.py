@@ -7,7 +7,7 @@ from datetime import datetime
 
 from pre_filter import filter_raw_data
 from clustering import cluster_texts
-from filter_candidate_event import is_cluster_event, enrich_event_obj
+from enrich_calculate import is_cluster_event, enrich_event_obj, strategy_update
 from llm_summarize import llm_summarize
 from standardized_tool import StandardizedEvent
 from event_engine import EventEngine
@@ -95,7 +95,7 @@ def run_pipeline(input_files, output_dir, dedup_db_path):
                 std_data.append(std_item)
             
         print(f"[Stage 1] {file_path} After standardization: {len(std_data)} effective items remaining.")
-        standardized_data.append(std_data)
+        standardized_data.extend(std_data)
 
 
     # 第二步：极其克制的静态洗流（集成持久化去重）
@@ -108,37 +108,46 @@ def run_pipeline(input_files, output_dir, dedup_db_path):
     print(f"[Stage 3] DBSCAN formed {len(clusters)} mathematical clusters.")
 
 
-    # 第四步: 利用调用纯数学统计提取关键词
-    # enrich_event_obj 方法中调用 event_engine接口，并把候选事件写入 db table: candidate_events
+    # 第四步: 利用调用纯数学统计进行事件的提取
     candidate_events = []
+    event_engine = EventEngine(dedup_db_path)
+    # 设定指标阈值,自定义策略
+    metrics = {
+        "momentum": 0.4,
+        "velocity": 0.4,
+        "level": 3,
+        "status": "active"
+    }
     for cluster in clusters:
         if is_cluster_event(cluster, threshold=3):
-            event_obj = enrich_event_obj(cluster) 
-            candidate_events.append(event_obj)
+            enrich_obj = enrich_event_obj(cluster) 
+            current_metrics = strategy_update(dedup_db_path, enrich_obj,**metrics)
+            ## 第五步：对事件的入库逻辑
+            candidates = event_engine.workflow_logic(enrich_obj,**current_metrics)
+            candidate_events.append(candidates)
            
     print(f"[Stage 4] candidate events written {len(candidate_events)} cluster events to db table: candidate_events")
     
-    # 第五步 追踪后续事件的更新
-    active_cluster_events = EventEngine.track_trends(candidate_events)
+    # 第六步 追踪候选事件的动态，得到目标事件
+    target_events = EventEngine.track_trends(candidate_events)
     print(f"[Stage 5] cative candidate events tracked")
 
-    # 第六步：LLM 有效性筛查（只过滤，不生成），将event对象转交给下一个业务对象
+    # 第七步：LLM 有效性筛查（只过滤，不生成），将event对象转交给下一个业务对象
     final_events = []
-    for event in active_cluster_events:
+    for event in target_events:
         if llm_summarize(event):
             final_events.append(event)
 
     print(f"[Stage 6] After LLM Boolean Check -> {len(final_events)} high-value events approved.")
 
-    
 
-    # 第六步：落盘结果，按运行时间戳命名
+    # 第八步：落盘结果，按运行时间戳命名
     os.makedirs(output_dir, exist_ok=True)
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = os.path.join(output_dir, f"events_{run_ts}.jsonl")
     with open(output_file, "w", encoding="utf-8") as f:
         for event in final_events:
-            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+            f.write(json.dumps(event.to_dict(), ensure_ascii=False) + "\n")
 
     print(f"--- [Success] Wrote {len(final_events)} event_obj(s) to: {output_file} ---")
 

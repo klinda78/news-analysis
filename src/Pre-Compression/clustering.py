@@ -2,8 +2,10 @@ from sklearn.cluster import DBSCAN
 import numpy as np
 from sklearn.metrics.pairwise import cosine_distances
 import uuid
+import time
 import requests
 import os
+from models import ClusterEventObject
 
 # 后续你可以把 API KEY 放在 config.json 里，目前先从环境变量读取或者在此暂定硬编码
 ZHIPU_API_KEY = os.environ.get("ZHIPU_API_KEY", "your_api_key_here")  
@@ -53,7 +55,7 @@ def cluster_texts(valid_data):
     if not valid_data:
         return []
         
-    texts = [item['text'] for item in valid_data]
+    texts = [item.content_payload['text'] for item in valid_data]
     
     # 彻底告别本地庞大的 PyTorch 和模型库开销
     print(f"正在通过智谱API拉取 {len(texts)} 条文本向量...")
@@ -83,20 +85,43 @@ def cluster_texts(valid_data):
     cluster_objects = []
     
     for label, data in clusters.items():
+        items_list = data["items"]
+        
         # 求出中心点坐标（质心）
         mean_embedding = np.mean(data["embeddings"], axis=0)
         
         # 寻找距离质心最近的那条原始文本作为代表作
         dists = cosine_distances([mean_embedding], data["embeddings"])[0]
         centroid_idx = np.argmin(dists)
-        centroid_text = data["items"][centroid_idx]["text"]
+        centroid_text = items_list[centroid_idx].content_payload["text"]
         
-        cluster_obj = {
-            "cluster_id": str(uuid.uuid4()),
-            "items": data["items"],
-            "centroid_text": centroid_text,
-            "size": len(data["items"])
-        }
+        # 派生时间相关指标
+        timestamps = [item.source_meta.get("ref_ts", 0) for item in items_list]
+        first_seen = min(timestamps) if timestamps else int(time.time())
+        last_seen  = max(timestamps) if timestamps else int(time.time())
+        time_span  = last_seen - first_seen
+        
+        # 去重来源平台列表
+        sources = list({item.source_meta.get("platform", "") for item in items_list if item.source_meta.get("platform")})
+        
+        # items 存为 Dict[int, EventObject]，与 ClusterEventObject 类型声明一致
+        items_dict = {i: item for i, item in enumerate(items_list)}
+        
+        cluster_obj = ClusterEventObject(
+            cluster_id   = str(uuid.uuid4()),
+            items        = items_dict,
+            centroid_text= centroid_text,
+            size         = len(items_list),
+            sources      = sources,
+            keywords     = [],          # 关键词提取可在后续步骤补充
+            first_seen   = first_seen,
+            last_seen    = last_seen,
+            time_span    = time_span,
+            velocity     = 0.0,         # 初始值，由 EventEngine 演算
+            momentum     = 0.0,
+            status       = "new",
+            level        = 1
+        )
         cluster_objects.append(cluster_obj)
         
     return cluster_objects
